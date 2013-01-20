@@ -1,12 +1,14 @@
 module("HTML5Tokenizer");
 
-function equalToken(actual, expected) {
+function equalToken(actual, expected, message) {
   if (actual instanceof Array) { actual = actual[0]; }
 
-  QUnit.push( actual.constructor === expected.constructor, actual.constructor.name, expected.constructor.name, "token type");
-  QUnit.push( actual.tagName === expected.tagName, actual.tagName, expected.tagName, "tagName" );
-  QUnit.push( actual.selfClosing === expected.selfClosing, actual.selfClosing, expected.selfClosing, "selfClosing" );
-  QUnit.push( QUnit.equiv(actual.attributes, expected.attributes), actual.attributes, expected.attributes, "attributes" );
+  if (message) { message = message + ": "; }
+
+  QUnit.push( actual.constructor === expected.constructor, actual.constructor.name, expected.constructor.name, message + "token type");
+  QUnit.push( actual.tagName === expected.tagName, actual.tagName, expected.tagName, message + "tagName" );
+  QUnit.push( actual.selfClosing === expected.selfClosing, actual.selfClosing, expected.selfClosing, message + "selfClosing" );
+  QUnit.push( QUnit.equiv(actual.attributes, expected.attributes), actual.attributes, expected.attributes, message + "attributes" );
 }
 
 test("A simple tag", function() {
@@ -57,4 +59,12 @@ test("A self-closing tag", function() {
 test("A tag with a / in the middle", function() {
   var tokens = HTML5Tokenizer.tokenize('<img / src="foo.png">');
   equalToken(tokens, new HTML5Tokenizer.StartTag("img", [["src", "foo.png"]]));
+});
+
+test("An opening and closing tag with some content", function() {
+  var tokens = HTML5Tokenizer.tokenize("<div id='foo' class='{{bar}} baz'>Some content</div>");
+
+  equalToken(tokens[0], new HTML5Tokenizer.StartTag("div", [["id", "foo"], ["class", "{{bar}} baz"]]), "<div>");
+  equalToken(tokens[1], new HTML5Tokenizer.Chars("Some content"), "content");
+  equalToken(tokens[2], new HTML5Tokenizer.EndTag("div"), "</div>");
 });
