@@ -68,3 +68,28 @@ test("An opening and closing tag with some content", function() {
   equalToken(tokens[1], new HTML5Tokenizer.Chars("Some content"), "content");
   equalToken(tokens[2], new HTML5Tokenizer.EndTag("div"), "</div>");
 });
+
+test("A comment", function() {
+  var tokens = HTML5Tokenizer.tokenize("<!-- hello -->");
+  equalToken(tokens, new HTML5Tokenizer.CommentToken(" hello "));
+});
+
+test("A (buggy) comment with no ending --", function() {
+  var tokens = HTML5Tokenizer.tokenize("<!-->");
+  equalToken(tokens, new HTML5Tokenizer.CommentToken(""));
+});
+
+test("A comment that immediately closes", function() {
+  var tokens = HTML5Tokenizer.tokenize("<!---->");
+  equalToken(tokens, new HTML5Tokenizer.CommentToken(""));
+});
+
+test("A comment that contains a -", function() {
+  var tokens = HTML5Tokenizer.tokenize("<!-- A perfectly legal - appears -->");
+  equalToken(tokens, new HTML5Tokenizer.CommentToken(" A perfectly legal - appears "));
+});
+
+test("A (buggy) comment that contains two --", function() {
+  var tokens = HTML5Tokenizer.tokenize("<!-- A questionable -- appears -->");
+  equalToken(tokens, new HTML5Tokenizer.CommentToken(" A questionable -- appears "));
+});
