@@ -34,4 +34,12 @@ test("A tag with a quotation mark in a single-quoted attribute", function() {
   generates("<div id='foo\"bar'>", '<div id="foo\\"bar">');
 });
 
+test("A tag containing characters", function() {
+  generates("<div id='foo'>\n\tone fish\n\ttwo fish\n</div>", '<div id="foo">\n\tone fish\n\ttwo fish\n</div>');
+});
+
+test("A comment", function() {
+  generates("<!-- hello -->", "<!-- hello -->");
+});
+
 })();
