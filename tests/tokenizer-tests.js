@@ -11,6 +11,11 @@ function equalToken(actual, expected, message) {
   QUnit.push( QUnit.equiv(actual.attributes, expected.attributes), actual.attributes, expected.attributes, message + "attributes" );
 }
 
+test("Simple content", function() {
+  var tokens = HTML5Tokenizer.tokenize("hello");
+  equalToken(tokens, new HTML5Tokenizer.Chars("hello"));
+});
+
 test("A simple tag", function() {
   var tokens = HTML5Tokenizer.tokenize("<div>");
   equalToken(tokens, new HTML5Tokenizer.StartTag("div"));
