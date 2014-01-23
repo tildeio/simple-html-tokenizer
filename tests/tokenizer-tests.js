@@ -51,6 +51,11 @@ test("A tag with unquoted attribute", function() {
   equalToken(tokens, new HTML5Tokenizer.StartTag("div", [["id", "foo"]]));
 });
 
+test("A tag with a nonterminal, valueless attribute", function() {
+  var tokens = HTML5Tokenizer.tokenize('<div disabled id=foo>');
+  equalToken(tokens, new HTML5Tokenizer.StartTag("div", [["disabled", null], ["id", "foo"]]));
+});
+
 test("A tag with multiple attributes", function() {
   var tokens = HTML5Tokenizer.tokenize('<div id=foo class="bar baz" href=\'bat\'>');
   equalToken(tokens, new HTML5Tokenizer.StartTag("div", [["id", "foo"], ["class", "bar baz"], ["href", "bat"]]));
