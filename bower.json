@@ -1,0 +1,7 @@
+{
+  "name": "simple-html-tokenizer",
+  "devDependencies": {
+    "loader.js": "~1.0.0",
+    "qunit": "~1.14.0"
+  }
+}
