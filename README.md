@@ -64,3 +64,25 @@ HTML5Tokenizer.configure('generateAttributes', function(attributes) {
   // attributes part to be inserted into the tag.
 });
 ```
+
+## Building and running the tests
+
+Before running the build or tests make sure you have grunt and bower installed globally.
+
+```bash
+npm install -g grunt-cli
+npm install -g bower
+```
+
+Next install the package dependencies:
+
+```bash
+npm install
+bower install
+```
+
+Grunt commands:
+
+`grunt dist` - Build dist (commonjs, amd, globals)
+`grunt test` - Run tests in node
+`grunt server` - Run tests in browser at <http://localhost:4200>

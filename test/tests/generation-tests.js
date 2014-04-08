@@ -1,9 +1,6 @@
-(function() {
+import { tokenize, generate } from "simple-html-tokenizer";
 
-module("Generation");
-
-var tokenize = HTML5Tokenizer.tokenize;
-var generate = HTML5Tokenizer.generate;
+QUnit.module("simple-html-tokenizer - generation");
 
 function generates(source, expected) {
   var actual = generate(tokenize(source));
@@ -41,5 +38,3 @@ test("A tag containing characters", function() {
 test("A comment", function() {
   generates("<!-- hello -->", "<!-- hello -->");
 });
-
-})();
