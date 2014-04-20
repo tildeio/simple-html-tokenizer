@@ -13,14 +13,14 @@ module.exports = function(grunt) {
   grunt.initConfig({
     broccoli: {
       dist: {
-        config: require('./Brocfile').dist,
+        config: 'tasks/build/dist.js',
         dest: 'dist'
       },
       browser: {
-        config: require('./Brocfile').testInBrowser
+        config: 'tasks/build/tests-browser.js'
       },
       node: {
-        config: require('./Brocfile').testInNode,
+        config: 'tasks/build/tests-node.js',
         dest: 'tmp/node'
       }
     },
