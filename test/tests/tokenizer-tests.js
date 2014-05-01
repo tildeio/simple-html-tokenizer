@@ -104,3 +104,11 @@ test("A (buggy) comment that contains two --", function() {
   var tokens = tokenize("<!-- A questionable -- appears -->");
   tokensEqual(tokens, new CommentToken(" A questionable -- appears "));
 });
+
+test("Character references are expanded", function() {
+  var tokens = tokenize("&quot;Foo &amp; Bar&quot; &lt; &#60;&#x3c; &#x3C; &LT; &NotGreaterFullEqual; &Borksnorlax; &nleqq;");
+  tokensEqual(tokens, new Chars('"Foo & Bar" < << < < ≧̸ &Borksnorlax; ≦̸'), "in data");
+
+  var tokens = tokenize("<div title='&quot;Foo &amp; Bar&quot; &lt; &#60;&#x3c; &#x3C; &LT; &NotGreaterFullEqual; &Borksnorlax; &nleqq;'>");
+  tokensEqual(tokens, new StartTag("div", [["title", '"Foo & Bar" < << < < ≧̸ &Borksnorlax; ≦̸']]), "in attributes");
+});
