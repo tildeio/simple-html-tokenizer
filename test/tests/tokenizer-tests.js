@@ -1,14 +1,7 @@
 import { tokenize, Chars, StartTag, EndTag, CommentToken } from "simple-html-tokenizer";
+import { tokensEqual, locInfo } from "simple-html-tokenizer/helpers";
 
-QUnit.module("simple-html-tokenizer");
-
-function tokensEqual(actual, expected, message) {
-  if (!(expected instanceof Array)) {
-    expected = [expected];
-  }
-
-  deepEqual(actual, expected, message);
-}
+QUnit.module("simple-html-tokenizer - tokenizer");
 
 test("Simple content", function() {
   var tokens = tokenize("hello");
@@ -107,8 +100,47 @@ test("A (buggy) comment that contains two --", function() {
 
 test("Character references are expanded", function() {
   var tokens = tokenize("&quot;Foo &amp; Bar&quot; &lt; &#60;&#x3c; &#x3C; &LT; &NotGreaterFullEqual; &Borksnorlax; &nleqq;");
-  tokensEqual(tokens, new Chars('"Foo & Bar" < << < < ≧̸ &Borksnorlax; ≦̸'), "in data");
+  tokensEqual(tokens, new Chars('"Foo & Bar" < << < < ≧̸ &Borksnorlax; ≦̸'), false, "in data");
 
   var tokens = tokenize("<div title='&quot;Foo &amp; Bar&quot; &lt; &#60;&#x3c; &#x3C; &LT; &NotGreaterFullEqual; &Borksnorlax; &nleqq;'>");
-  tokensEqual(tokens, new StartTag("div", [["title", '"Foo & Bar" < << < < ≧̸ &Borksnorlax; ≦̸']]), "in attributes");
+  tokensEqual(tokens, new StartTag("div", [["title", '"Foo & Bar" < << < < ≧̸ &Borksnorlax; ≦̸']]), false, "in attributes");
+});
+
+QUnit.module("simple-html-tokenizer - location info");
+
+test("tokens: chars start-tag chars", function() {
+  var tokens = tokenize("chars<div>chars");
+  tokensEqual(tokens, [
+    locInfo(new Chars("chars"), 1, 1, 1, 5),
+    locInfo(new StartTag('div'), 1, 6, 1, 10),
+    locInfo(new Chars("chars"), 1, 11, 1, 15)
+  ], true);
+});
+
+test("tokens: start-tag start-tag", function() {
+  var tokens = tokenize("<div><div>");
+  tokensEqual(tokens, [
+    locInfo(new StartTag('div'), 1, 1, 1, 5),
+    locInfo(new StartTag('div'), 1, 6, 1, 10),
+  ], true);
+});
+
+test("tokens: chars \\n start-tag chars \\r\\n tag", function() {
+  var tokens = tokenize("chars\n<div>chars\r\n<div>");
+  tokensEqual(tokens, [
+    locInfo(new Chars("chars\n"), 1, 1, 2, 0),
+    locInfo(new StartTag('div'), 2, 1, 2, 5),
+    locInfo(new Chars("chars\r\n"), 2, 6, 3, 0),
+    locInfo(new StartTag('div'), 3, 1, 3, 5)
+  ], true);
+});
+
+test("tokens: comment start-tag chars end-tag ", function() {
+  var tokens = tokenize("<!-- multline\ncomment --><div foo=bar>chars\n</div>");
+  tokensEqual(tokens, [
+    locInfo(new CommentToken(" multline\ncomment "), 1, 1, 2, 11),
+    locInfo(new StartTag('div', [['foo', "bar"]]), 2, 12, 2, 24),
+    locInfo(new Chars("chars\n"), 2, 25, 3, 0),
+    locInfo(new EndTag('div'), 3, 1, 3, 6)
+  ], true);
 });
