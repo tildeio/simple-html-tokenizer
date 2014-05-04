@@ -28,6 +28,16 @@ test("A simple closing tag with trailing spaces", function() {
   tokensEqual(tokens, new EndTag("div"));
 });
 
+test("A pair of hyphenated tags", function() {
+  var tokens = tokenize("<x-foo></x-foo>");
+  tokensEqual(tokens, [new StartTag("x-foo"), new EndTag("x-foo")]);
+});
+
+test("A pair of mixed-case tags", function() {
+  var tokens = tokenize("<TaBlE></TABle");
+  tokensEqual(tokens, [new StartTag("table"), new EndTag("table")]);
+});
+
 test("A tag with a single-quoted attribute", function() {
   var tokens = tokenize("<div id='foo'>");
   tokensEqual(tokens, new StartTag("div", [["id", "foo"]]));
