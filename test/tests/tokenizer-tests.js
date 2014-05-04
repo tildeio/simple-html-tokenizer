@@ -106,6 +106,13 @@ test("Character references are expanded", function() {
   tokensEqual(tokens, new StartTag("div", [["title", '"Foo & Bar" < << < < ≧̸ &Borksnorlax; ≦̸']]), false, "in attributes");
 });
 
+QUnit.module("simple-html-tokenizer - preprocessing");
+
+test("Carriage returns are replaced with line feeds", function() {
+  var tokens = tokenize("\r\r\n\r\r\n\n");
+  tokensEqual(tokens, locInfo(new Chars("\n\n\n\n\n"), 2, 0, 6, 0), true);
+});
+
 QUnit.module("simple-html-tokenizer - location info");
 
 test("tokens: chars start-tag chars", function() {
@@ -125,12 +132,12 @@ test("tokens: start-tag start-tag", function() {
   ], true);
 });
 
-test("tokens: chars \\n start-tag chars \\r\\n tag", function() {
-  var tokens = tokenize("chars\n<div>chars\r\n<div>");
+test("tokens: chars start-tag chars start-tag", function() {
+  var tokens = tokenize("chars\n<div>chars\n<div>");
   tokensEqual(tokens, [
     locInfo(new Chars("chars\n"), 1, 1, 2, 0),
     locInfo(new StartTag('div'), 2, 1, 2, 5),
-    locInfo(new Chars("chars\r\n"), 2, 6, 3, 0),
+    locInfo(new Chars("chars\n"), 2, 6, 3, 0),
     locInfo(new StartTag('div'), 3, 1, 3, 5)
   ], true);
 });
