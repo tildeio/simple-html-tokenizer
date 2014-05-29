@@ -33,11 +33,6 @@ test("A pair of hyphenated tags", function() {
   tokensEqual(tokens, [new StartTag("x-foo"), new EndTag("x-foo")]);
 });
 
-test("A pair of mixed-case tags", function() {
-  var tokens = tokenize("<TaBlE></TABle");
-  tokensEqual(tokens, [new StartTag("table"), new EndTag("table")]);
-});
-
 test("A tag with a single-quoted attribute", function() {
   var tokens = tokenize("<div id='foo'>");
   tokensEqual(tokens, new StartTag("div", [["id", "foo"]]));
@@ -61,6 +56,16 @@ test("A tag with a nonterminal, valueless attribute", function() {
 test("A tag with multiple attributes", function() {
   var tokens = tokenize('<div id=foo class="bar baz" href=\'bat\'>');
   tokensEqual(tokens, new StartTag("div", [["id", "foo"], ["class", "bar baz"], ["href", "bat"]]));
+});
+
+test("A tag with capitalization in attributes", function() {
+  var tokens = tokenize('<svg viewBox="0 0 0 0">');
+  tokensEqual(tokens, new StartTag("svg", [["viewBox", "0 0 0 0"]]));
+});
+
+test("A tag with capitalization in the tag", function() {
+  var tokens = tokenize('<linearGradient>');
+  tokensEqual(tokens, new StartTag("linearGradient", []));
 });
 
 test("A self-closing tag", function() {
