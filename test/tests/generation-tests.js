@@ -1,4 +1,4 @@
-import { tokenize, generate } from "simple-html-tokenizer";
+import { tokenize, generate } from "../../simple-html-tokenizer";
 
 QUnit.module("simple-html-tokenizer - generation");
 

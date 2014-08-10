@@ -1,5 +1,5 @@
-import { tokenize, Chars, StartTag, EndTag, CommentToken } from "simple-html-tokenizer";
-import { tokensEqual, locInfo } from "simple-html-tokenizer/helpers";
+import { tokenize, Chars, StartTag, EndTag, CommentToken } from "../../simple-html-tokenizer";
+import { tokensEqual, locInfo } from "../../simple-html-tokenizer/helpers";
 
 QUnit.module("simple-html-tokenizer - tokenizer");
 
