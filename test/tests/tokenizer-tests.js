@@ -143,7 +143,7 @@ test("tokens: start-tag start-tag", function() {
   var tokens = tokenize("<div><div>");
   tokensEqual(tokens, [
     locInfo(new StartTag('div'), 1, 1, 1, 5),
-    locInfo(new StartTag('div'), 1, 6, 1, 10),
+    locInfo(new StartTag('div'), 1, 6, 1, 10)
   ], true);
 });
 
