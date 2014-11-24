@@ -35,32 +35,37 @@ test("A pair of hyphenated tags", function() {
 
 test("A tag with a single-quoted attribute", function() {
   var tokens = tokenize("<div id='foo'>");
-  tokensEqual(tokens, new StartTag("div", [["id", "foo"]]));
+  tokensEqual(tokens, new StartTag("div", [["id", "foo", true]]));
 });
 
 test("A tag with a double-quoted attribute", function() {
   var tokens = tokenize('<div id="foo">');
-  tokensEqual(tokens, new StartTag("div", [["id", "foo"]]));
+  tokensEqual(tokens, new StartTag("div", [["id", "foo", true]]));
+});
+
+test("A tag with a double-quoted empty", function() {
+  var tokens = tokenize('<div id="">');
+  tokensEqual(tokens, new StartTag("div", [["id", "", true]]));
 });
 
 test("A tag with unquoted attribute", function() {
   var tokens = tokenize('<div id=foo>');
-  tokensEqual(tokens, new StartTag("div", [["id", "foo"]]));
+  tokensEqual(tokens, new StartTag("div", [["id", "foo", false]]));
 });
 
 test("A tag with a nonterminal, valueless attribute", function() {
   var tokens = tokenize('<div disabled id=foo>');
-  tokensEqual(tokens, new StartTag("div", [["disabled", null], ["id", "foo"]]));
+  tokensEqual(tokens, new StartTag("div", [["disabled", null, null], ["id", "foo", false]]));
 });
 
 test("A tag with multiple attributes", function() {
   var tokens = tokenize('<div id=foo class="bar baz" href=\'bat\'>');
-  tokensEqual(tokens, new StartTag("div", [["id", "foo"], ["class", "bar baz"], ["href", "bat"]]));
+  tokensEqual(tokens, new StartTag("div", [["id", "foo", false], ["class", "bar baz", true], ["href", "bat", true]]));
 });
 
 test("A tag with capitalization in attributes", function() {
   var tokens = tokenize('<svg viewBox="0 0 0 0">');
-  tokensEqual(tokens, new StartTag("svg", [["viewBox", "0 0 0 0"]]));
+  tokensEqual(tokens, new StartTag("svg", [["viewBox", "0 0 0 0", true]]));
 });
 
 test("A tag with capitalization in the tag", function() {
@@ -75,14 +80,14 @@ test("A self-closing tag", function() {
 
 test("A tag with a / in the middle", function() {
   var tokens = tokenize('<img / src="foo.png">');
-  tokensEqual(tokens, new StartTag("img", [["src", "foo.png"]]));
+  tokensEqual(tokens, new StartTag("img", [["src", "foo.png", true]]));
 });
 
 test("An opening and closing tag with some content", function() {
   var tokens = tokenize("<div id='foo' class='{{bar}} baz'>Some content</div>");
 
   tokensEqual(tokens, [
-    new StartTag("div", [["id", "foo"], ["class", "{{bar}} baz"]]),
+    new StartTag("div", [["id", "foo", true], ["class", "{{bar}} baz", true]]),
     new Chars("Some content"),
     new EndTag("div")
   ]);
@@ -118,7 +123,7 @@ test("Character references are expanded", function() {
   tokensEqual(tokens, new Chars('"Foo & Bar" < << < < ≧̸ &Borksnorlax; ≦̸'), false, "in data");
 
   var tokens = tokenize("<div title='&quot;Foo &amp; Bar&quot; &lt; &#60;&#x3c; &#x3C; &LT; &NotGreaterFullEqual; &Borksnorlax; &nleqq;'>");
-  tokensEqual(tokens, new StartTag("div", [["title", '"Foo & Bar" < << < < ≧̸ &Borksnorlax; ≦̸']]), false, "in attributes");
+  tokensEqual(tokens, new StartTag("div", [["title", '"Foo & Bar" < << < < ≧̸ &Borksnorlax; ≦̸', true]]), false, "in attributes");
 });
 
 QUnit.module("simple-html-tokenizer - preprocessing");
@@ -161,7 +166,7 @@ test("tokens: comment start-tag chars end-tag ", function() {
   var tokens = tokenize("<!-- multline\ncomment --><div foo=bar>chars\n</div>");
   tokensEqual(tokens, [
     locInfo(new CommentToken(" multline\ncomment "), 1, 1, 2, 11),
-    locInfo(new StartTag('div', [['foo', "bar"]]), 2, 12, 2, 24),
+    locInfo(new StartTag('div', [['foo', "bar", false]]), 2, 12, 2, 24),
     locInfo(new Chars("chars\n"), 2, 25, 3, 0),
     locInfo(new EndTag('div'), 3, 1, 3, 6)
   ], true);
