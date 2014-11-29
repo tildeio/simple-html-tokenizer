@@ -53,9 +53,9 @@ test("A tag with unquoted attribute", function() {
   tokensEqual(tokens, new StartTag("div", [["id", "foo", false]]));
 });
 
-test("A tag with a nonterminal, valueless attribute", function() {
-  var tokens = tokenize('<div disabled id=foo>');
-  tokensEqual(tokens, new StartTag("div", [["disabled", null, null], ["id", "foo", false]]));
+test("A tag with valueless attributes", function() {
+  var tokens = tokenize('<div foo bar>');
+  tokensEqual(tokens, new StartTag("div", [["foo", "", false], ["bar", "", false]]));
 });
 
 test("A tag with multiple attributes", function() {
