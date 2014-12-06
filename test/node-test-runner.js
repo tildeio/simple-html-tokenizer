@@ -5,7 +5,7 @@ require('qunitjs');
 var qe = require('qunit-extras');
 qe.runInContext(global);
 
-global.SimpleHTMLTokenizer = require('../dist/simple-html-tokenizer');
+global.HTML5Tokenizer = require('../dist/simple-html-tokenizer');
 require('./support.js');
 require('./generation-tests.js');
 require('./tokenizer-tests.js');

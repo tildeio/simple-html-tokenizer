@@ -1,8 +1,8 @@
-/* global SimpleHTMLTokenizer: false */
+/* global HTML5Tokenizer: false */
 (function () {
 
 QUnit.assert.generates = function(source, expected) {
-  var actual = SimpleHTMLTokenizer.generate(SimpleHTMLTokenizer.tokenize(source));
+  var actual = HTML5Tokenizer.generate(HTML5Tokenizer.tokenize(source));
   this.push(actual === expected, actual, expected);
 };
 
