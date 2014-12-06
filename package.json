@@ -1,19 +1,22 @@
 {
   "name": "simple-html-tokenizer",
-  "main": "dist/commonjs/simple-html-tokenizer.js",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "Simple HTML Tokenizer is a lightweight JavaScript library that can be used to tokenize the kind of HTML normally found in templates.",
+  "keywords": [
+    "html",
+    "tokenizer"
+  ],
+  "main": "dist/simple-html-tokenizer.js",
   "scripts": {
-    "test": "grunt test",
-    "postinstall": "grunt dist"
+    "build": "compile-modules convert -I lib -f bundle -o dist/simple-html-tokenizer.js simple-html-tokenizer.umd.js",
+    "postinstall": "npm run build",
+    "test": "npm run build && node ./test/node-test-runner.js"
   },
-  "dependencies": {
-    "broccoli-concat": "~0.0.6",
-    "broccoli-es6-module-transpiler": "~0.1.0",
-    "broccoli-file-mover": "~0.3.1",
-    "broccoli-globalize-amd": "~0.0.3",
-    "broccoli-merge-trees": "~0.1.3",
-    "broccoli-static-compiler": "~0.1.4",
-    "grunt": "~0.4.4",
-    "grunt-broccoli": "~0.2.1",
-    "grunt-contrib-clean": "~0.5.0"
+  "devDependencies": {
+    "es6-module-transpiler": "^0.9.5",
+    "qunit-extras": "^1.3.0",
+    "qunitjs": "^1.16.0",
+    "testem": "^0.6.23"
   }
 }

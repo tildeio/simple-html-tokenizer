@@ -1,7 +1,13 @@
 {
   "name": "simple-html-tokenizer",
-  "devDependencies": {
-    "loader.js": "stefanpenner/loader.js#7f79173fd5c61dc256af9aa01c56d50ebfec10fe",
-    "qunit": "~1.14.0"
-  }
+  "version": "0.1.0",
+  "main": "dist/simple-html-tokenizer.js",
+  "ignore": [
+    ".gitignore",
+    ".jshintrc",
+    ".travis.yml",
+    "testem.json",
+    "node_modules",
+    "test"
+  ]
 }

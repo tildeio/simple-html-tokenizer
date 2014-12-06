@@ -3,20 +3,15 @@
 <head>
   <meta charset="utf-8">
   <title>QUnit Example</title>
-  <link rel="stylesheet" href="vendor/qunit.css">
+  <link rel="stylesheet" href="../node_modules/qunitjs/qunit/qunit.css">
 </head>
 <body>
   <div id="qunit"></div>
-  <script src="vendor/loader.js"></script>
-  <script src="vendor/qunit.js"></script>
-  <script src="simple-html-tokenizer-and-tests.amd.js"></script>
-  <script type="text/javascript">
-    requireModule('simple-html-tokenizer');
-    for (var key in requireModule.entries) {
-      if (/^simple-html-tokenizer\/tests\//.test(key)) {
-        requireModule(key);
-      }
-    }
-  </script>
+  <script src="../node_modules/qunitjs/qunit/qunit.js"></script>
+  <script src="../dist/simple-html-tokenizer.js"></script>
+  <script src="support.js"></script>
+  <script src="generation-tests.js"></script>
+  <script src="tokenizer-tests.js"></script>
+  <script src="/testem.js"></script>
 </body>
 </html>
