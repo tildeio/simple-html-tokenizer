@@ -21,7 +21,7 @@ QUnit.test("A tag with an unquoted attribute", function(assert) {
 });
 
 QUnit.test("A tag with a quotation mark in a single-quoted attribute", function(assert) {
-  assert.generates("<div id='foo\"bar'>", '<div id="foo\\"bar">');
+  assert.generates("<div id='foo\"bar'>", '<div id="foo&quot;bar">');
 });
 
 QUnit.test("A tag containing characters", function(assert) {

@@ -73,7 +73,7 @@ QUnit.test("A tag with capitalization in the tag", function(assert) {
 
 QUnit.test("A self-closing tag", function(assert) {
   var tokens = HTML5Tokenizer.tokenize('<img />');
-  assert.tokensEqual(tokens, new HTML5Tokenizer.StartTag("img", [], { selfClosing: true }));
+  assert.tokensEqual(tokens, new HTML5Tokenizer.StartTag("img", [], true));
 });
 
 QUnit.test("A tag with a / in the middle", function(assert) {
@@ -93,27 +93,27 @@ QUnit.test("An opening and closing tag with some content", function(assert) {
 
 QUnit.test("A comment", function(assert) {
   var tokens = HTML5Tokenizer.tokenize("<!-- hello -->");
-  assert.tokensEqual(tokens, new HTML5Tokenizer.CommentToken(" hello "));
+  assert.tokensEqual(tokens, new HTML5Tokenizer.Comment(" hello "));
 });
 
 QUnit.test("A (buggy) comment with no ending --", function(assert) {
   var tokens = HTML5Tokenizer.tokenize("<!-->");
-  assert.tokensEqual(tokens, new HTML5Tokenizer.CommentToken());
+  assert.tokensEqual(tokens, new HTML5Tokenizer.Comment());
 });
 
 QUnit.test("A comment that immediately closes", function(assert) {
   var tokens = HTML5Tokenizer.tokenize("<!---->");
-  assert.tokensEqual(tokens, new HTML5Tokenizer.CommentToken());
+  assert.tokensEqual(tokens, new HTML5Tokenizer.Comment());
 });
 
 QUnit.test("A comment that contains a -", function(assert) {
   var tokens = HTML5Tokenizer.tokenize("<!-- A perfectly legal - appears -->");
-  assert.tokensEqual(tokens, new HTML5Tokenizer.CommentToken(" A perfectly legal - appears "));
+  assert.tokensEqual(tokens, new HTML5Tokenizer.Comment(" A perfectly legal - appears "));
 });
 
 QUnit.test("A (buggy) comment that contains two --", function(assert) {
   var tokens = HTML5Tokenizer.tokenize("<!-- A questionable -- appears -->");
-  assert.tokensEqual(tokens, new HTML5Tokenizer.CommentToken(" A questionable -- appears "));
+  assert.tokensEqual(tokens, new HTML5Tokenizer.Comment(" A questionable -- appears "));
 });
 
 QUnit.test("Character references are expanded", function(assert) {
@@ -172,7 +172,7 @@ QUnit.test("tokens: comment start-tag Chars end-tag ", function(assert) {
   var tokens = HTML5Tokenizer.tokenize("<!-- multline\ncomment --><div foo=bar>Chars\n</div>");
   assert.tokensEqual(tokens, function (locInfo) {
     return [
-      locInfo(new HTML5Tokenizer.CommentToken(" multline\ncomment "), 1, 1, 2, 11),
+      locInfo(new HTML5Tokenizer.Comment(" multline\ncomment "), 1, 1, 2, 11),
       locInfo(new HTML5Tokenizer.StartTag('div', [['foo', "bar", false]]), 2, 12, 2, 24),
       locInfo(new HTML5Tokenizer.Chars("Chars\n"), 2, 25, 3, 0),
       locInfo(new HTML5Tokenizer.EndTag('div'), 3, 1, 3, 6)
