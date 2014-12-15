@@ -4,7 +4,7 @@ QUnit.test("A simple tag", function(assert) {
   assert.generates("<div>", "<div>");
 });
 
-QUnit.test("A simple tag with spce", function(assert) {
+QUnit.test("A simple tag with space", function(assert) {
   assert.generates("<div  >", "<div>");
 });
 
