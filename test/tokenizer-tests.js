@@ -129,7 +129,7 @@ QUnit.module("simple-html-tokenizer - preprocessing");
 QUnit.test("Carriage returns are replaced with line feeds", function(assert) {
   var tokens = HTML5Tokenizer.tokenize("\r\r\n\r\r\n\n");
   assert.tokensEqual(tokens, function (locInfo) {
-    return locInfo(new HTML5Tokenizer.Chars("\n\n\n\n\n"), 2, 0, 6, 0);
+    return locInfo(new HTML5Tokenizer.Chars("\n\n\n\n\n"), 1, 0, 6, 0);
   });
 });
 
@@ -139,9 +139,9 @@ QUnit.test("tokens: Chars start-tag Chars", function(assert) {
   var tokens = HTML5Tokenizer.tokenize("Chars<div>Chars");
   assert.tokensEqual(tokens, function (locInfo) {
     return [
-      locInfo(new HTML5Tokenizer.Chars("Chars"), 1, 1, 1, 5),
-      locInfo(new HTML5Tokenizer.StartTag('div'), 1, 6, 1, 10),
-      locInfo(new HTML5Tokenizer.Chars("Chars"), 1, 11, 1, 15)
+      locInfo(new HTML5Tokenizer.Chars("Chars"), 1, 0, 1, 5),
+      locInfo(new HTML5Tokenizer.StartTag('div'), 1, 5, 1, 10),
+      locInfo(new HTML5Tokenizer.Chars("Chars"), 1, 10, 1, 15)
     ];
   });
 });
@@ -150,8 +150,8 @@ QUnit.test("tokens: start-tag start-tag", function(assert) {
   var tokens = HTML5Tokenizer.tokenize("<div><div>");
   assert.tokensEqual(tokens, function (locInfo) {
     return [
-      locInfo(new HTML5Tokenizer.StartTag('div'), 1, 1, 1, 5),
-      locInfo(new HTML5Tokenizer.StartTag('div'), 1, 6, 1, 10)
+      locInfo(new HTML5Tokenizer.StartTag('div'), 1, 0, 1, 5),
+      locInfo(new HTML5Tokenizer.StartTag('div'), 1, 5, 1, 10)
     ];
   });
 });
@@ -160,10 +160,10 @@ QUnit.test("tokens: Chars start-tag Chars start-tag", function(assert) {
   var tokens = HTML5Tokenizer.tokenize("Chars\n<div>Chars\n<div>");
   assert.tokensEqual(tokens, function (locInfo) {
     return [
-      locInfo(new HTML5Tokenizer.Chars("Chars\n"), 1, 1, 2, 0),
-      locInfo(new HTML5Tokenizer.StartTag('div'), 2, 1, 2, 5),
-      locInfo(new HTML5Tokenizer.Chars("Chars\n"), 2, 6, 3, 0),
-      locInfo(new HTML5Tokenizer.StartTag('div'), 3, 1, 3, 5)
+      locInfo(new HTML5Tokenizer.Chars("Chars\n"), 1, 0, 2, 0),
+      locInfo(new HTML5Tokenizer.StartTag('div'), 2, 0, 2, 5),
+      locInfo(new HTML5Tokenizer.Chars("Chars\n"), 2, 5, 3, 0),
+      locInfo(new HTML5Tokenizer.StartTag('div'), 3, 0, 3, 5)
     ];
   });
 });
@@ -172,10 +172,10 @@ QUnit.test("tokens: comment start-tag Chars end-tag ", function(assert) {
   var tokens = HTML5Tokenizer.tokenize("<!-- multline\ncomment --><div foo=bar>Chars\n</div>");
   assert.tokensEqual(tokens, function (locInfo) {
     return [
-      locInfo(new HTML5Tokenizer.Comment(" multline\ncomment "), 1, 1, 2, 11),
-      locInfo(new HTML5Tokenizer.StartTag('div', [['foo', "bar", false]]), 2, 12, 2, 24),
-      locInfo(new HTML5Tokenizer.Chars("Chars\n"), 2, 25, 3, 0),
-      locInfo(new HTML5Tokenizer.EndTag('div'), 3, 1, 3, 6)
+      locInfo(new HTML5Tokenizer.Comment(" multline\ncomment "), 1, 0, 2, 11),
+      locInfo(new HTML5Tokenizer.StartTag('div', [['foo', "bar", false]]), 2, 11, 2, 24),
+      locInfo(new HTML5Tokenizer.Chars("Chars\n"), 2, 24, 3, 0),
+      locInfo(new HTML5Tokenizer.EndTag('div'), 3, 0, 3, 6)
     ];
   });
 });
