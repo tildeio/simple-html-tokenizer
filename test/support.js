@@ -17,21 +17,24 @@ QUnit.assert.tokensEqual = function(actual, _expected, message){
   deepEqual(actual, makeArray(expected), message);
 };
 
-function locInfo(token, firstLine, firstColumn, lastLine, lastColumn) {
-  token.firstLine = firstLine;
-  token.firstColumn = firstColumn;
-  token.lastLine = lastLine;
-  token.lastColumn = lastColumn;
+function locInfo(token, startLine, startColumn, endLine, endColumn) {
+  token.loc = {
+    start: {
+      line: startLine,
+      column: startColumn
+    },
+    end: {
+      line: endLine,
+      column: endColumn
+    }
+  };
+
   return token;
 }
 
 function removeLocInfo(tokens) {
   for (var i = 0; i < tokens.length; i++) {
-    var token = tokens[i];
-    delete token.firstLine;
-    delete token.firstColumn;
-    delete token.lastLine;
-    delete token.lastColumn;
+    delete tokens[i].loc;
   }
 }
 
