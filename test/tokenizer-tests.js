@@ -128,12 +128,26 @@ QUnit.module("simple-html-tokenizer - preprocessing");
 
 QUnit.test("Carriage returns are replaced with line feeds", function(assert) {
   var tokens = HTML5Tokenizer.tokenize("\r\r\n\r\r\n\n");
+  assert.tokensEqual(tokens, new HTML5Tokenizer.Chars("\n\n\n\n\n"));
+});
+
+QUnit.module("simple-html-tokenizer - location info");
+
+QUnit.test("lines are counted correctly", function(assert) {
+  var tokens = HTML5Tokenizer.tokenize("\r\r\n\r\r\n\n");
   assert.tokensEqual(tokens, function (locInfo) {
     return locInfo(new HTML5Tokenizer.Chars("\n\n\n\n\n"), 1, 0, 6, 0);
   });
 });
 
-QUnit.module("simple-html-tokenizer - location info");
+QUnit.test("tokens: Chars", function(assert) {
+  var tokens = HTML5Tokenizer.tokenize("Chars");
+  assert.tokensEqual(tokens, function (locInfo) {
+    return [
+      locInfo(new HTML5Tokenizer.Chars("Chars"), 1, 0, 1, 5)
+    ];
+  });
+});
 
 QUnit.test("tokens: Chars start-tag Chars", function(assert) {
   var tokens = HTML5Tokenizer.tokenize("Chars<div>Chars");
