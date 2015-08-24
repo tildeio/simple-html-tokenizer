@@ -1,8 +1,8 @@
-/* jshint node:true */
+#!/usr/bin/env node
 require('qunitjs');
 
 if (process.argv[2] === 'testem') {
-  // TAP output for testem process runner
+  // use basic TAP output for testem
   var sys = require('sys');
   var num = 1;
   QUnit.begin(function (details) {
@@ -12,13 +12,15 @@ if (process.argv[2] === 'testem') {
     sys.puts((details.failed ? 'not ok ' : 'ok ') + (num++) + ' - ' + details.module + ' - ' + details.name);
   });
 } else {
+  // otherwise use a nicer test reporter
   var qe = require('qunit-extras');
   qe.runInContext(global);
 }
 
+// we share the test file between browser/node
+// export the global
 global.HTML5Tokenizer = require('../dist/simple-html-tokenizer');
-require('./support.js');
-require('./generation-tests.js');
-require('./tokenizer-tests.js');
+require('../test/tokenizer-tests.js');
 
+// run tests
 QUnit.load();

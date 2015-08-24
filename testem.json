@@ -1,10 +1,10 @@
 {
   "test_page": "test/index.html",
   "parallel": 5,
-  "before_tests": "npm run build",
+  "before_tests": "bin/build.js",
   "launchers": {
     "Node": {
-      "command": "node test/node-runner.js testem",
+      "command": "bin/test.js testem",
       "protocol": "tap"
     }
   },
