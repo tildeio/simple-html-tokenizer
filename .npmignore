@@ -1,5 +1,6 @@
 /node_modules/
-/test
+/test/
+/bin/
 /.jshintrc
 /.npmignore
 /.travis.yml
