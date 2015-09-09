@@ -114,6 +114,24 @@ QUnit.test("A self-closing tag", function(assert) {
   ]);
 });
 
+QUnit.test("A self-closing tag with valueless attributes (regression)", function(assert) {
+  var tokens = HTML5Tokenizer.tokenize('<input disabled />');
+  assert.deepEqual(tokens, [
+    startTag("input", [
+      ["disabled", "", false]
+    ], true)
+  ]);
+});
+
+QUnit.test("A self-closing tag with valueless attributes without space before closing (regression)", function(assert) {
+  var tokens = HTML5Tokenizer.tokenize('<input disabled/>');
+  assert.deepEqual(tokens, [
+    startTag("input", [
+      ["disabled", "", false]
+    ], true)
+  ]);
+});
+
 QUnit.test("A tag with a / in the middle", function(assert) {
   var tokens = HTML5Tokenizer.tokenize('<img / src="foo.png">');
   assert.deepEqual(tokens, [
