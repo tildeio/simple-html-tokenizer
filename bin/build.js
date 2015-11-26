@@ -2,7 +2,7 @@
 var path = require('path');
 var rollup = require('rollup');
 
-var entry = path.resolve(__dirname, '../lib/simple-html-tokenizer.js');
+var entry = path.resolve(__dirname, '../lib/simple-html-tokenizer/index.js');
 var dest = path.resolve(__dirname, '../dist/simple-html-tokenizer.js');
 
 rollup.rollup({
