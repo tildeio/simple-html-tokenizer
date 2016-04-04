@@ -13,6 +13,7 @@
   },
   "main": "dist/simple-html-tokenizer.js",
   "jsnext:main": "lib/simple-html-tokenizer.js",
+  "typings": "simple-html-tokenizer.d.ts",
   "scripts": {
     "build": "bin/build.js",
     "prepublish": "npm run build",
