@@ -2,9 +2,9 @@
 // https://github.com/tildeio/simple-html-tokenizer/
 
 declare module simpleHTMLTokenizer {
-  type AttributeType = [string, string, boolean | void];
+  export type AttributeType = [string, string, boolean | void];
 
-  interface TokenInterface {
+  export interface TokenInterface {
     type: "StartTag" | "EndTag" | "Chars" | "Comment";
     tagName?: string;
     attributes?: AttributeType[];
@@ -22,7 +22,7 @@ declare module simpleHTMLTokenizer {
     };
   }
 
-  interface HTML5NamedCharRefsInterface {
+  export interface HTML5NamedCharRefsInterface {
     Aacute: string;
     aacute: string;
     Abreve: string;
@@ -2205,7 +2205,7 @@ declare module simpleHTMLTokenizer {
     };
   }
 
-  interface TokenizerOptionsInterface {
+  export interface TokenizerOptionsInterface {
     loc: boolean | void;
   }
 
