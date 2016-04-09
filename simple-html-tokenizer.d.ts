@@ -2242,7 +2242,7 @@ declare module simpleHTMLTokenizer {
     finishAttributeValue(): void;
   }
 
-  export function tokenize(input: string, options?: any): TokenInterface[];
+  export function tokenize(input: string, options?: TokenizerOptionsInterface): TokenInterface[];
 }
 
 export = simpleHTMLTokenizer
