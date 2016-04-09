@@ -2,10 +2,12 @@
 // https://github.com/tildeio/simple-html-tokenizer/
 
 declare module simpleHTMLTokenizer {
+  type AttributeType = [string, string, boolean | void];
+
   interface TokenInterface {
     type: "StartTag" | "EndTag" | "Chars" | "Comment";
     tagName?: string;
-    attributes?: [string, string, boolean | void][];
+    attributes?: AttributeType[];
     chars: string;
     selfClosing: boolean;
     loc?: {
@@ -2208,7 +2210,7 @@ declare module simpleHTMLTokenizer {
   }
 
   export class Tokenizer {
-    private _currentAttribute: [string, string, boolean | void];
+    private _currentAttribute: AttributeType;
     token: TokenInterface | void;
     tokens: TokenInterface[] | void;
     startLine: number;
