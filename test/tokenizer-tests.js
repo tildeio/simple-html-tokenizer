@@ -239,6 +239,14 @@ QUnit.test("tokens: start-tag start-tag", function(assert) {
   ]);
 });
 
+QUnit.test("tokens: html char ref start-tag", function(assert) {
+  var tokens = HTML5Tokenizer.tokenize("&gt;<div>", { loc: true });
+  assert.deepEqual(tokens, [
+    locInfo(chars('>'), 1, 0, 1, 4),
+    locInfo(startTag('div'), 1, 4, 1, 9)
+  ]);
+});
+
 QUnit.test("tokens: Chars start-tag Chars start-tag", function(assert) {
   var tokens = HTML5Tokenizer.tokenize("Chars\n<div>Chars\n<div>", { loc: true });
   assert.deepEqual(tokens, [
@@ -303,4 +311,3 @@ function locInfo(token, startLine, startColumn, endLine, endColumn) {
 
   return token;
 }
-
