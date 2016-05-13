@@ -60,7 +60,7 @@ Tokenizer.prototype = {
     this.tokens.push(this.token);
   },
 
-  appendToData: function(char) {
+  appendToData: function(pos, char) {
     this.token.chars += char;
   },
 
@@ -78,7 +78,7 @@ Tokenizer.prototype = {
     this.tokens.push(this.token);
   },
 
-  appendToCommentData: function(char) {
+  appendToCommentData: function(pos, char) {
     this.token.chars += char;
   },
 
@@ -98,7 +98,7 @@ Tokenizer.prototype = {
     this.tokens.push(this.token);
   },
 
-  beginEndTag: function() {
+  beginEndTag: function(pos) {
     this.token = {
       type: 'EndTag',
       tagName: ''
@@ -106,17 +106,16 @@ Tokenizer.prototype = {
     this.tokens.push(this.token);
   },
 
-  finishTag: function() {
+  finishTag: function(pos, selfClosing) {
+    if (this.token.type === 'StartTag') {
+      this.token.selfClosing = selfClosing;
+    }
     this.addLocInfo();
-  },
-
-  markTagAsSelfClosing: function() {
-    this.token.selfClosing = true;
   },
 
   // Tags - name
 
-  appendToTagName: function(char) {
+  appendToTagName: function(pos, char) {
     this.token.tagName += char;
   },
 
@@ -127,21 +126,18 @@ Tokenizer.prototype = {
     this.token.attributes.push(this._currentAttribute);
   },
 
-  appendToAttributeName: function(char) {
+  appendToAttributeName: function(pos, char) {
     this._currentAttribute[0] += char;
   },
 
-  beginAttributeValue: function(isQuoted) {
+  beginAttributeValue: function(pos, isQuoted) {
     this._currentAttribute[2] = isQuoted;
   },
 
-  appendToAttributeValue: function(char) {
+  appendToAttributeValue: function(pos, char) {
     this._currentAttribute[1] = this._currentAttribute[1] || "";
     this._currentAttribute[1] += char;
   },
-
-  finishAttributeValue: function() {
-  }
 };
 
 export default Tokenizer;
