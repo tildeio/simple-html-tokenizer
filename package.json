@@ -14,17 +14,25 @@
   "main": "dist/simple-html-tokenizer.js",
   "jsnext:main": "lib/simple-html-tokenizer.js",
   "scripts": {
-    "build": "bin/build.js",
-    "prepublish": "npm run build",
     "test": "testem ci",
     "lint": "jshint bin lib test"
   },
   "devDependencies": {
-    "jshint": "^2.8.0",
+    "bower": "^1.7.9",
+    "ember-cli": "^2.5.0",
+    "broccoli-concat": "^2.2.0",
+    "broccoli-funnel": "^1.0.1",
+    "broccoli-merge-trees": "^1.1.1",
+    "broccoli-stew": "^1.2.0",
+    "broccoli-babel-transpiler": "^5.5.0",
+    "broccoli-typescript-compiler": "^0.6.0",
+    "typescript": "next",
+    "tslint": "next",
+    "jshint": "^2.9.2",
     "qunit-extras": "^1.4.2",
-    "qunitjs": "^1.18.0",
+    "loader.js": "^4.0.4",
+    "qunit": "^0.9.1",
     "rollup": "^0.14.1",
-    "testem": "^0.9.2",
-    "typescript": "^1.9.0-dev.20160512"
+    "testem": "^1.7.1"
   }
 }
