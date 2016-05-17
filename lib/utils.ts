@@ -18,7 +18,11 @@ export type opaque = {} | void;
 export type Option<T> = T | null;
 export type Maybe<T> = Option<T> | null;
 
-export function unwrap<T>(maybe: Maybe<T>): T {
-  if (!maybe) throw new Error(`Unwrapping ${maybe}, but it was null`);
+export function unwrap<T>(maybe: Maybe<T>, msg?: string): T {
+  if (!maybe) throw new Error(`${msg || 'value'} was null`);
   return maybe;
+}
+
+export function or<T, U>(maybe: Maybe<T>, otherwise: U): T | U {
+  return maybe || otherwise;
 }

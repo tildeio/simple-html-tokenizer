@@ -10,14 +10,14 @@
   <script src="./qunit.js"></script>
   <script src="./loader.js"></script>
   <script src="./runtime.js"></script>
-  <script src="../amd/tokenizer.amd.js"></script>
-  <script src="../amd/tokenizer-tests.amd.js"></script>
+  <script src="../es5/simple-html-tokenizer.js"></script>
+  <script src="../es5/tokenizer-tests.js"></script>
   <script src="/testem.js"></script>
 
   <script>
     Object.keys(require.entries).forEach(function(e) {
       if (e.match(/-tests$/)) require(e);
-    })
+    });
   </script>
 </body>
 </html>

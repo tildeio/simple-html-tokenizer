@@ -3,17 +3,17 @@ import EntityParser from './entity-parser';
 
 function noop() {}
 
-function wrapDelegate(tokenizer, innerDelegate) {
+function wrapDelegate(tokenizer: EventedTokenizer, innerDelegate: DelegateOptions): Delegate {
   var events = [
     'reset', 'whitespace',
     'beginData', 'appendToData', 'finishData',
     'beginComment', 'appendToCommentData', 'finishComment',
     'openTag', 'beginTagName', 'appendToTagName', 'finishTagName', 'finishTag',
     'beginAttributeName', 'appendToAttributeName', 'finishAttributeName', 'beginWholeAttributeValue', 'beginAttributeValue', 'appendToAttributeValue', 'finishAttributeValue', 'finishWholeAttributeValue', 'voidAttributeValue',
-  ]
+  ];
 
   function Delegate() {
-    var self = this;
+    var self: Delegate = this;
 
     events.forEach(function(event) {
       if (innerDelegate[event]) {
@@ -24,16 +24,70 @@ function wrapDelegate(tokenizer, innerDelegate) {
     });
   }
 
-  return new Delegate();
+  return new (Delegate as any)() as Delegate;
 }
 
-interface Delegate {
-  
+export type Char = string | { chars: string, source: string };
+
+export interface DelegateOptions {
+  finishData?(pos: Position): void;
+  finishAttributeName?(pos: Position): void;
+  voidAttributeValue?(pos: Position): void;
+  whitespace?(pos: Position, char: string): void;
+  appendToCommentData?(pos: Position, char: string): void;
+  beginData?(pos: Position): void;
+  appendToData?(pos: Position, char: Char): void;
+  openTag?(pos: Position, kind: 'start' | 'end'): void;
+  beginTagName?(pos: Position): void;
+  appendToTagName?(pos: Position, char: string): void;
+  beginComment?(pos: Position): void;
+  finishComment?(pos: Position): void;
+  appendToCommentData?(pos: Position, char: string): void;
+  finishTagName?(pos: Position): void;
+  finishTag?(pos: Position, selfClosing: boolean): void;
+  beginAttributeName?(pos: Position): void;
+  appendToAttributeName?(pos: Position, char: string): void;
+  beginWholeAttributeValue?(pos: Position): void;
+  beginAttributeValue?(pos: Position, quoted: boolean): void;
+  appendToAttributeValue?(pos: Position, char: Char): void;
+  finishAttributeValue?(pos: Position, quoted: boolean): void;
+  finishWholeAttributeValue?(pos: Position): void;
+  [index: string]: (pos: Position, ...args: any[]) => void;
 }
 
-interface Position {
+export interface Delegate extends DelegateOptions {
+  finishData(pos: Position): void;
+  finishAttributeName(pos: Position): void;
+  voidAttributeValue(pos: Position): void;
+  whitespace(pos: Position, char: string): void;
+  appendToCommentData(pos: Position, char: string): void;
+  beginData(pos: Position): void;
+  appendToData(pos: Position, char: Char): void;
+  openTag(pos: Position, kind: 'start' | 'end'): void;
+  beginTagName(pos: Position): void;
+  appendToTagName(pos: Position, char: string): void;
+  beginComment(pos: Position): void;
+  finishComment(pos: Position): void;
+  appendToCommentData(pos: Position, char: string): void;
+  finishTagName(pos: Position): void;
+  finishTag(pos: Position, selfClosing: boolean): void;
+  beginAttributeName(pos: Position): void;
+  appendToAttributeName(pos: Position, char: string): void;
+  beginWholeAttributeValue(pos: Position): void;
+  beginAttributeValue(pos: Position, quoted: boolean): void;
+  appendToAttributeValue(pos: Position, char: Char): void;
+  finishAttributeValue(pos: Position, quoted: boolean): void;
+  finishWholeAttributeValue(pos: Position): void;
+}
+
+export interface Position {
   line: number;
   column: number;
+}
+
+export interface Location {
+  start: Position;
+  end: Position;
 }
 
 interface Marked {
@@ -50,8 +104,8 @@ export default class EventedTokenizer {
   public index = 0;
   public tagLine: Option<number> = null;
   public tagColumn: Option<number> = null;
-  public bufferedWhitespace = [];
-  public bufferedData = [];
+  public bufferedWhitespace: [Position, string][] = [];
+  public bufferedData: [Position, string][] = [];
   public line = 1;
   public column = 0;
 
@@ -63,18 +117,18 @@ export default class EventedTokenizer {
     charRef: null
   }
 
-  constructor(public delegate, public entityParser: EntityParser, public input: string = '') {
+  constructor(public delegate: DelegateOptions, public entityParser: EntityParser, public input: string = '') {
     this.delegate = wrapDelegate(this, delegate);
     this.entityParser = entityParser;
     this.state = BeforeData;
   }
 
-  tokenize(input) {
+  tokenize(input: string) {
     this.tokenizePart(input);
     this.tokenizeEOF();
   }
 
-  tokenizePart(input) {
+  tokenizePart(input: string) {
     this.input += preprocessInput(input);
 
     while (this.index < this.input.length) {
@@ -94,8 +148,8 @@ export default class EventedTokenizer {
   }
 
   voidAttributeValue() {
-    this.delegate.finishAttributeName(this.marked.attrEnd);
-    this.delegate.voidAttributeValue(this.marked.attrEnd);
+    this.delegate.finishAttributeName(unwrap(this.marked.attrEnd));
+    this.delegate.voidAttributeValue(unwrap(this.marked.attrEnd));
     this.flushWhitespace();
   }
 
@@ -169,7 +223,7 @@ export default class EventedTokenizer {
     this.marked.charRef = this.pos();
   }
 
-  bufferWhitespace(char) {
+  bufferWhitespace(char: string) {
     this.bufferedWhitespace.push([this.pos(), char]);
   }
 
@@ -204,7 +258,7 @@ export default class EventedTokenizer {
 }
 
 interface State {
-  process(t: EventedTokenizer);
+  process(t: EventedTokenizer): void;
 }
 
 const BeforeData: State = {
@@ -217,7 +271,7 @@ const BeforeData: State = {
       t.consume();
     } else {
       t.state = Data;
-      t.delegate.beginData(this);
+      t.delegate.beginData(t);
     }
   }  
 }
@@ -227,7 +281,7 @@ const Data: State = {
     var char = t.peek();
 
     if (char === "<") {
-      t.delegate.finishData(this);
+      t.delegate.finishData(t);
       t.state = TagOpen;
       t.markTagStart();
       t.consume(); 
@@ -253,7 +307,7 @@ const TagOpen: State = {
       t.consume();
     } else if (isAlpha(char)) {
       t.state = TagName;
-      t.delegate.openTag(t.marked.tagStart, 'start');
+      t.delegate.openTag(unwrap(t.marked.tagStart), 'start');
       t.delegate.beginTagName(t);
       t.delegate.appendToTagName(t, char.toLowerCase());
       t.consume();
@@ -267,7 +321,7 @@ const MarkupDeclaration: State = {
 
     if (char === "-" && t.input.charAt(t.index) === "-") {
       t.state = CommentStart;
-      t.delegate.beginComment(t.marked.tagStart);
+      t.delegate.beginComment(unwrap(t.marked.tagStart));
       t.consume();
     }
   }
@@ -308,7 +362,7 @@ const CommentStartDash: State = {
       t.state = BeforeData;
     } else {
       t.flushCommentData();
-      t.delegate.appendToCommentData(char);
+      t.delegate.appendToCommentData(t, char);
       t.consume();
       t.state = Comment;
     }
@@ -621,7 +675,7 @@ const EndTagOpen: State = {
 
     if (isAlpha(char)) {
       t.state = TagName;
-      t.delegate.openTag(t.marked.tagStart, 'end');
+      t.delegate.openTag(unwrap(t.marked.tagStart), 'end');
       t.delegate.beginTagName(t);
       t.delegate.appendToTagName(t, char.toLowerCase());
       t.consume();

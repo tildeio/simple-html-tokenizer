@@ -160,7 +160,7 @@ QUnit.test("A comment", function(assert) {
 QUnit.test("A (buggy) comment with no ending --", function(assert) {
   var tokens = tokenize("<!-->");
   assert.deepEqual(tokens, [
-    comment()
+    comment('')
   ]);
 });
 
@@ -269,37 +269,59 @@ QUnit.test("tokens: comment start-tag Chars end-tag", function(assert) {
   ]);
 });
 
-function chars(s) {
+function chars(chars: string = '') {
   return {
     type: "Chars",
-    chars: s || ""
+    loc: null as Location,
+    chars
   };
 }
 
-function comment(s) {
+function comment(chars: string = '') {
   return {
     type: "Comment",
-    chars: s || ""
+    loc: null as Location,
+    chars
   };
 }
 
-function startTag(tagName, attributes, selfClosing) {
+type Option<T> = T | null;
+
+interface Position {
+  line: number;
+  column: number;
+}
+
+interface Location {
+  start: Position;
+  end: Position;
+}
+
+interface Token {
+  loc: Option<Location>;
+}
+
+type Attribute = [string, string, boolean];
+
+function startTag(tagName: string, attributes: Attribute[] = [], selfClosing: boolean = false) {
   return {
     type: "StartTag",
-    tagName: tagName,
-    attributes: attributes === undefined ? [] : attributes,
-    selfClosing: selfClosing === undefined ? false : selfClosing,
+    loc: null as Location,
+    tagName,
+    attributes,
+    selfClosing
   };
 }
 
-function endTag(tagName) {
+function endTag(tagName: string) {
   return {
     type: "EndTag",
+    loc: null as Location,
     tagName: tagName
   };
 }
 
-function locInfo(token, startLine, startColumn, endLine, endColumn) {
+function locInfo(token: Token, startLine: number, startColumn: number, endLine: number, endColumn: number) {
   token.loc = {
     start: {
       line: startLine,

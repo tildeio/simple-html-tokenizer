@@ -8,6 +8,7 @@ var concat = require('broccoli-concat');
 var stew = require('broccoli-stew');
 var merge = require('broccoli-merge-trees');
 var resolve = require('resolve');
+var rollup = require('broccoli-rollup')
 
 var find = stew.find;
 var mv = stew.mv;
@@ -43,27 +44,33 @@ function transpileDirectory(packages, options) {
   });
 
   var es6Tree = merge([typescript(tsTree, tsOptions), jsTree]);
-  var es5Tree = transpile(es6Tree, 'ES5 Lib Tree');
-  es6Tree = mv(es6Tree, 'es6');
-  es5Tree = mv(es5Tree, 'named-amd');
-  var concatTree;
 
-  if (options && options.concat) {
-    concatTree = concatLibs(es5Tree, { outputFile: options.concat });
-  }
+  var rollupTree = rollup(es6Tree, {
+    inputFiles: ['**/*.js'],
+    rollup: {
+      entry: 'index.js',
+      dest: options.name + '.js',
+      external: options.extern
+    }
+  });
 
-  return { es6: es6Tree, es5: es5Tree, concat: concatTree };
+  var es5Tree = transpile(rollupTree, 'ES5 Lib Tree');
+  es6Tree = mv(es6Tree, 'es6/' + options.name);
+  es5Tree = mv(es5Tree, 'es5');
+
+  return { es6: es6Tree, es5: es5Tree };
 }
 
 //////
 
 module.exports = function(defaults) {
   var lib = transpileDirectory(__dirname + '/lib', {
-    concat: '/amd/tokenizer.amd.js'
+    name: 'simple-html-tokenizer',
   });
 
   var test = transpileDirectory(__dirname + '/tests', {
-    concat: '/amd/tokenizer-tests.amd.js'
+    name: 'tokenizer-tests',
+    extern: ['simple-html-tokenizer']
   });
 
   var testHarness = buildTarget('tests/', function(output) {
@@ -76,8 +83,7 @@ module.exports = function(defaults) {
   return merge([
     lib.es5,
     lib.es6,
-    lib.concat,
-    test.concat,
+    test.es5,
     testHarness
   ]);
 
@@ -126,8 +132,6 @@ function nodeModule(name, files, dest) {
   if (name.indexOf('/') === -1) {
     name = path.dirname(require.resolve(name));
   }
-
-  console.log('funnel', name, files);
 
   return new Funnel(name, {
     include: [files],

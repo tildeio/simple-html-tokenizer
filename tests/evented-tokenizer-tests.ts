@@ -1,4 +1,4 @@
-/* global HTML5Tokenizer: false */
+import { EventedTokenizer, EntityParser, HTML5NamedCharRefs } from 'simple-html-tokenizer';
 
 var eventNames = [
   'reset', 'whitespace',
@@ -8,19 +8,39 @@ var eventNames = [
   'beginAttributeName', 'appendToAttributeName', 'finishAttributeName', 'beginWholeAttributeValue', 'beginAttributeValue', 'appendToAttributeValue', 'finishAttributeValue', 'finishWholeAttributeValue', 'voidAttributeValue',
 ];
 
-var delegate = {};
-var events;
+interface Dict<T> {
+  [key: string]: T;
+}
+
+interface Position {
+  line: number;
+  column: number;
+}
+
+interface Location {
+  start: Position;
+  end: Position;
+}
+
+type Char = string | { chars: string, source: string };
+type SimpleEvent = [string] | [string, Position];
+type Event<T> = SimpleEvent | [string, Position, T]
+
+type opaque = {} | void;
+
+var delegate: Dict<any> = {};
+let events: Event<opaque>[], e: Events;
 
 eventNames.forEach(function(event) {
-  delegate[event] = function(pos, data) {
-    let e = [event];
-
-    if (arguments.length > 0) {
-      e.push({ line: pos.line, column: pos.column });
-    }
+  delegate[event] = function<T>(pos: Position, data: T) {
+    let e: Event<T>;
 
     if (arguments.length > 1) {
-      e.push(data);
+      e = [event, { line: pos.line, column: pos.column }, data];
+    } else if (arguments.length > 0) {
+      e = [event, { line: pos.line, column: pos.column }];
+    } else {
+      e = [event];
     }
 
     events.push(e);
@@ -32,193 +52,197 @@ function setup() {
   e = new Events();
 }
 
-function tokenize(input) {
-  var tokenizer = new HTML5Tokenizer.EventedTokenizer(
+function tokenize(input: string) {
+  var tokenizer = new EventedTokenizer(
     delegate,
-    new HTML5Tokenizer.EntityParser(HTML5Tokenizer.HTML5NamedCharRefs)
+    new EntityParser(HTML5NamedCharRefs)
   );
 
   tokenizer.tokenize(input);
 }
 
-function EventClass(constructor) {
-  constructor.prototype.toEvents = function() {
+abstract class EventGroup {
+  protected events: Event<opaque>[] = [];
+
+  add(event: Event<opaque>) {
+    this.events.push(event);
+  }
+
+  toEvents(): Event<opaque>[] {
     return this.events;
-  };
-
-  return constructor;
+  }
 }
 
-var Data = EventClass(function(chars) {
-  var events = [];
-  events.push(e.beginData());
+class Data extends EventGroup {
+  constructor(chars: string) {
+    super();
 
-  for (var i=0; i<chars.length; i++) {
-    events.push(e.appendToData(chars[i]))
+    this.add(e.beginData());
+
+    for (var i=0; i<chars.length; i++) {
+      this.add(e.appendToData(chars[i]))
+    }
+
+    this.add(e.finishData());
   }
-
-  events.push(e.finishData());
-
-  this.events = events;
-});
-
-var DataChars = EventClass(function(chars) {
-  var events = [];
-
-  for (var i=0; i<chars.length; i++) {
-    events.push(e.appendToData(chars[i]))
-  }
-
-  this.events = events;
-});
-
-var DataEntity = EventClass(function(entity, source) {
-  this.events = [
-    e.appendToData({ chars: entity, source: source })
-  ];
-});
-
-var Comment = EventClass(function(chars, close) {
-  var events = [];
-  events.push(e.beginComment());
-
-  for (var i=0; i<chars.length; i++) {
-    events.push(e.appendToCommentData(chars[i]))
-  }
-
-  if (arguments.length === 1) {
-    close = '--';
-  }
-
-  for (let i=0; i<close.length; i++) {
-    events.push(e.whitespace(close[i]));
-  }
-
-  events.push(e.finishComment());
-
-  this.events = events;
-});
-
-var CommentChars = EventClass(function(chars) {
-  var events = [];
-
-  for (var i=0; i<chars.length; i++) {
-    events.push(e.appendToCommentData(chars[i]))
-  }
-
-  this.events = events;
-});
-
-var CommentEntity = EventClass(function(entity, source) {
-  this.events = [
-    e.appendToCommentData({ chars: entity, source: source })
-  ];
-});
-
-var TagName = EventClass(function(chars) {
-  var events = [];
-
-  events.push(e.beginTagName());
-
-  for (var i=0; i<chars.length; i++) {
-    events.push(e.appendToTagName(chars[i]))
-  }
-
-  events.push(e.finishTagName());
-
-  this.events = events;
-});
-
-var AttributeName = EventClass(function(chars) {
-  var events = [];
-
-  events.push(e.beginAttributeName());
-
-  for (var i=0; i<chars.length; i++) {
-    events.push(e.appendToAttributeName(chars[i]))
-  }
-
-  events.push(e.finishAttributeName());
-
-  this.events = events;
-});
-
-var StartAttributeValue = EventClass(function(quote) {
-  var events = [
-    e.beginWholeAttributeValue()
-  ];
-
-  if (quote) events.push(e.whitespace(quote));
-  events.push(e.beginAttributeValue(!!quote));
-
-  this.events = events;
-});
-
-var FinishAttributeValue = EventClass(function(quote) {
-  var events = [
-    e.finishAttributeValue(!!quote)
-  ];
-
-  if (quote) events.push(e.whitespace(quote));
-  events.push(e.finishWholeAttributeValue());
-
-  this.events = events;
-});
-
-var AttributeValue = EventClass(function(chars, quote) {
-  var events = [];
-
-  events.push(e.beginWholeAttributeValue());
-  if (quote) events.push(e.whitespace(quote));
-  events.push(e.beginAttributeValue(!!quote));
-
-  for (var i=0; i<chars.length; i++) {
-    events.push(e.appendToAttributeValue(chars[i]))
-  }
-
-  events.push(e.finishAttributeValue(!!quote));
-  if (quote) events.push(e.whitespace(quote));
-  events.push(e.finishWholeAttributeValue());  
-
-  this.events = events;
-});
-
-var AttributeValueChars = EventClass(function(chars) {
-  var events = [];
-
-  for (var i=0; i<chars.length; i++) {
-    events.push(e.appendToAttributeValue(chars[i]))
-  }
-
-  this.events = events;
-});
-
-var AttributeValueEntity = EventClass(function(entity, source) {
-  this.events = [
-    e.appendToAttributeValue({ chars: entity, source: source })
-  ];
-});
-
-var Whitespace = EventClass(function(chars) {
-  var events = [];
-
-  for (var i=0; i<chars.length; i++) {
-    events.push(e.whitespace(chars[i]))
-  }
-
-  this.events = events;
-});
-
-function Events() {
-  this.column = 0;
-  this.line = 1;
 }
 
-Events.prototype = {
-  advance: function(char) {
+class DataChars extends EventGroup {
+  constructor(chars: string) {
+    super();
+
+    for (var i=0; i<chars.length; i++) {
+      this.add(e.appendToData(chars[i]))
+    }
+  }
+}
+
+class DataEntity extends EventGroup {
+  constructor(entity: string, source: string) {
+    super();
+
+    this.add(e.appendToData({ chars: entity, source: source }));
+  }
+}
+
+class Comment extends EventGroup {
+  constructor(chars: string, close: string = '--') {
+    super();
+    this.add(e.beginComment());
+
+    for (var i=0; i<chars.length; i++) {
+      this.add(e.appendToCommentData(chars[i]))
+    }
+
+    for (let i=0; i<close.length; i++) {
+      this.add(e.whitespace(close[i]));
+    }
+
+    this.add(e.finishComment());
+  }
+}
+
+class CommentChars extends EventGroup {
+  constructor(chars: string) {
+    super();
+    for (var i=0; i<chars.length; i++) {
+      this.add(e.appendToCommentData(chars[i]))
+    }
+  }
+}
+
+class CommentEntity extends EventGroup {
+  constructor(entity: string, source: string) {
+    super();
+    this.add(e.appendToCommentData({ chars: entity, source: source }));
+  }
+}
+
+class TagName extends EventGroup {
+  constructor(chars: string) {
+    super();
+
+    this.add(e.beginTagName());
+
+    for (var i=0; i<chars.length; i++) {
+      this.add(e.appendToTagName(chars[i]))
+    }
+
+    this.add(e.finishTagName());
+  }
+}
+
+class AttributeName extends EventGroup {
+  constructor(chars: string) {
+    super();
+
+    this.add(e.beginAttributeName());
+
+    for (var i=0; i<chars.length; i++) {
+      this.add(e.appendToAttributeName(chars[i]))
+    }
+
+    this.add(e.finishAttributeName());
+  }
+}
+
+class StartAttributeValue extends EventGroup {
+  constructor(quote: string) {
+    super();
+    
+    this.add(e.beginWholeAttributeValue());
+
+    if (quote) this.add(e.whitespace(quote));
+    this.add(e.beginAttributeValue(!!quote));
+  }
+}
+
+class FinishAttributeValue extends EventGroup {
+  constructor(quote: string) {
+    super();
+
+    this.add(e.finishAttributeValue(!!quote));
+
+    if (quote) this.add(e.whitespace(quote));
+    this.add(e.finishWholeAttributeValue());
+  }
+}
+
+class AttributeValue extends EventGroup {
+  constructor(chars: string, quote: string) {
+    super();
+
+    this.add(e.beginWholeAttributeValue());
+    if (quote) this.add(e.whitespace(quote));
+    this.add(e.beginAttributeValue(!!quote));
+
+    for (var i=0; i<chars.length; i++) {
+      this.add(e.appendToAttributeValue(chars[i]))
+    }
+
+    this.add(e.finishAttributeValue(!!quote));
+    if (quote) this.add(e.whitespace(quote));
+    this.add(e.finishWholeAttributeValue());  
+  }
+}
+
+class AttributeValueChars extends EventGroup {
+  constructor(chars: string) {
+    super();
+
+    for (var i=0; i<chars.length; i++) {
+      this.add(e.appendToAttributeValue(chars[i]))
+    }
+  }
+}
+
+class AttributeValueEntity extends EventGroup {
+  constructor(entity: string, source: string) {
+    super();
+    this.add(e.appendToAttributeValue({ chars: entity, source: source }));
+  }
+}
+
+class Whitespace extends EventGroup {
+  constructor(chars: string) {
+    super();
+    
+    for (var i=0; i<chars.length; i++) {
+      this.add(e.whitespace(chars[i]))
+    }
+  }
+}
+
+class Events {
+  column = 0;
+  line = 1;
+
+  advance(char: Char): Position {
     let pos = this.pos();
 
-    if (char === '\n') {
+    if (typeof char !== 'string') {
+      this.advance(char.chars);
+    } else if (char === '\n') {
       this.line++;
       this.column = 0;
     } else {
@@ -226,143 +250,143 @@ Events.prototype = {
     }
 
     return pos;
-  },
+  }
 
-  skip: function(count) {
+  skip(count: number): Position {
     let pos = this.pos();
     this.column += count;
     return pos;
-  },
+  }
 
-  pos: function() {
+  pos() {
     return { line: this.line, column: this.column };
-  },
+  }
 
-  reset: function() {
+  reset() {
     return ['reset'];
-  },
+  }
 
-  whitespace: function(char) {
+  whitespace(char: string): Event<string> {
     return ['whitespace', this.advance(char), char];
-  },
+  }
 
-  beginData: function() {
+  beginData(): SimpleEvent {
     return ['beginData', this.pos()];
-  },
+  }
 
-  appendToData: function(char) {
+  appendToData(char: Char): Event<Char> {
     if (typeof char === 'string') {
       return ['appendToData', this.advance(char), char];
     } else {
       return ['appendToData', this.skip(char.source.length), char];
     }
-  },
+  }
 
-  finishData: function() {
+  finishData(): SimpleEvent {
     return ['finishData', this.pos()];
-  },
+  }
 
-  beginComment: function() {
+  beginComment(): SimpleEvent {
     let pos = this.advance('<');
     this.advance('!');
     this.advance('-');
     this.advance('-');
     return ['beginComment', pos];
-  },
+  }
 
-  appendToCommentData: function(char) {
+  appendToCommentData(char: Char): Event<Char> {
     return ['appendToCommentData', this.advance(char), char];
-  },
+  }
 
-  finishComment: function() {
+  finishComment(): SimpleEvent {
     this.advance('>');
     return ['finishComment', this.pos()];
-  },
+  }
 
-  openTag: function(kind) {
+  openTag(kind: 'start' | 'end'): Event<'start' | 'end'> {
     let pos = this.advance('<');
     if (kind === 'end') this.advance('/');
     return ['openTag', pos, kind];
-  },
+  }
 
-  beginTagName: function() {
+  beginTagName(): SimpleEvent {
     return ['beginTagName', this.pos()];
-  },
+  }
 
-  appendToTagName: function(char) {
+  appendToTagName(char: string): Event<string> {
     return ['appendToTagName', this.advance(char), char];
-  },
+  }
 
-  finishTagName: function() {
+  finishTagName(): SimpleEvent {
     return ['finishTagName', this.pos()];
-  },
+  }
 
-  finishTag: function(selfClosing) {
+  finishTag(selfClosing: boolean = false): Event<Boolean> {
     if (selfClosing) this.advance('/');
     this.advance('>');
-    return ['finishTag', this.pos(), selfClosing || false];
-  },
+    return ['finishTag', this.pos(), selfClosing];
+  }
 
-  beginAttributeName: function() {
+  beginAttributeName(): SimpleEvent {
     return ['beginAttributeName', this.pos()];
-  },
+  }
 
-  appendToAttributeName: function(char) {
+  appendToAttributeName(char: Char): Event<Char> {
     if (typeof char === 'string') {
       return ['appendToAttributeName', this.advance(char), char];
     } else {
       return ['appendToAttributeName', this.skip(char.source.length), char];
     }
-  },
+  }
 
-  finishAttributeName: function() {
+  finishAttributeName(): SimpleEvent {
     return ['finishAttributeName', this.pos()];
-  },
+  }
 
-  beginWholeAttributeValue: function() {
+  beginWholeAttributeValue(): SimpleEvent {
     return ['beginWholeAttributeValue', this.pos()];
-  },
+  }
 
-  beginAttributeValue: function(quoted) {
+  beginAttributeValue(quoted: boolean): Event<boolean> {
     return ['beginAttributeValue', this.pos(), quoted];
-  },
+  }
 
-  appendToAttributeValue: function(char) {
+  appendToAttributeValue(char: Char): Event<Char> {
     if (typeof char === 'string') {
       return ['appendToAttributeValue', this.advance(char), char];
     } else {
       return ['appendToAttributeValue', this.skip(char.source.length), char];
     }
-  },
+  }
 
-  finishAttributeValue: function(quoted) {
+  finishAttributeValue(quoted: boolean): Event<boolean> {
     return ['finishAttributeValue', this.pos(), quoted];
-  },
+  }
 
-  finishWholeAttributeValue: function() {
+  finishWholeAttributeValue(): SimpleEvent {
     return ['finishWholeAttributeValue', this.pos()];
-  },
+  }
 
-  voidAttributeValue: function() {
+  voidAttributeValue(): SimpleEvent {
     return ['voidAttributeValue', this.pos()];
   }
 }
 
-function format(event) {
+function format(event: Event<Char>) {
   let f = event[0];
 
-  if (event[1]) {
-    f += ": " + event[1].column + ":" + event[1].line;
+  if (event.length > 1) {
+    f += ": " + (event[1] as Position).column + ":" + (event[1] as Position).line;
   }
 
   if (event[2]) {
-    f += " (" + formatData(event[2]) + ")";
+    f += " (" + formatData(event[2] as Char) + ")";
   }
 
   return f;
 }
 
-function formatData(data) {
+function formatData(data: Char) {
   if (typeof data === 'object' && data.chars && data.source) {
     return data.chars + " as  " + data.source;
   } else if (typeof data === 'object') {
@@ -372,13 +396,11 @@ function formatData(data) {
   }
 }
 
-QUnit.assert.events = function(_expected, message) {
-  var expected = [];
-  expected.push(e.reset());
-  expected.push(e.reset());
+QUnit.assert.events = function(_expected: (Event<opaque> | EventGroup)[], message?: string) {
+  var expected: Event<opaque>[] = [];
 
   _expected.forEach(function(e) {
-    if (e.toEvents) {
+    if (e instanceof EventGroup) {
       expected = expected.concat(e.toEvents());
     } else {
       expected.push(e);
@@ -396,7 +418,7 @@ QUnit.module("simple-html-tokenizer - EventedTokenizer", {
   setup: setup
 });
 
-QUnit.test("Simple content", function(assert) {
+QUnit.test("Simple content", assert => {
   tokenize("hello");
 
   assert.events([
@@ -694,6 +716,7 @@ QUnit.test("A (buggy) comment that contains two --", function(assert) {
 QUnit.test("Character references are expanded", function(assert) {
   tokenize("&quot;Foo &amp; Bar&quot; &lt; &#60;&#x3c; &#x3C; &LT; &NotGreaterFullEqual; &Borksnorlax; &nleqq;");
 
+  debugger;
   var Entity = DataEntity;
 
   assert.events([

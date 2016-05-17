@@ -1,19 +1,21 @@
 {
     "compilerOptions": {
-        // "module": "es2015",
-        "target": "es5",
+        "target": "es2015",
+        "inlineSourceMap": true,
+        "inlineSources": true,
         "moduleResolution": "node",
-        "noImplicitAny": false,
-        "outDir": "ts-dist",
-        "sourceMap": false,
-        "allowJs": true,
-        "strictNullChecks": true
+        "noImplicitAny": true,
+        "rootDir": "./",
+        "baseUrl" : "./",
+        "paths": {
+            "simple-html-tokenizer": [
+                "lib/index.ts"
+            ]
+        }
     },
     "exclude": [
-        "*",
-        "bin",
-        "dist",
+        "tmp",
         "node_modules",
-        "ts-dist"
+        "dist"        
     ]
 }

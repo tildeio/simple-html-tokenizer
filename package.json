@@ -32,7 +32,7 @@
     "qunit-extras": "^1.4.2",
     "loader.js": "^4.0.4",
     "qunit": "^0.9.1",
-    "rollup": "^0.14.1",
+    "broccoli-rollup": "^0.0.4",
     "testem": "^1.7.1"
   }
 }
