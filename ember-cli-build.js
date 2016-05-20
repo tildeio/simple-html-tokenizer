@@ -36,7 +36,8 @@ var tsOptions = {
 
 function transpileDirectory(packages, options) {
   var tsTree = find(packages, {
-    include: ['**/*.ts']
+    include: ['**/*.ts'],
+    exclude: ['**/*.d.ts']
   });
 
   var jsTree = find(packages, {
@@ -64,7 +65,7 @@ function transpileDirectory(packages, options) {
 //////
 
 module.exports = function(defaults) {
-  var lib = transpileDirectory(__dirname + '/lib', {
+  var lib = transpileDirectory(__dirname + '/src', {
     name: 'simple-html-tokenizer',
   });
 

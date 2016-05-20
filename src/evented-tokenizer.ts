@@ -30,13 +30,13 @@ function wrapDelegate(tokenizer: EventedTokenizer, innerDelegate: DelegateOption
 export type Char = string | { chars: string, source: string };
 
 export interface DelegateOptions {
+  beginData?(pos: Position): void;
+  appendToData?(pos: Position, char: Char): void;
   finishData?(pos: Position): void;
   finishAttributeName?(pos: Position): void;
   voidAttributeValue?(pos: Position): void;
   whitespace?(pos: Position, char: string): void;
   appendToCommentData?(pos: Position, char: string): void;
-  beginData?(pos: Position): void;
-  appendToData?(pos: Position, char: Char): void;
   openTag?(pos: Position, kind: 'start' | 'end'): void;
   beginTagName?(pos: Position): void;
   appendToTagName?(pos: Position, char: string): void;
@@ -56,13 +56,13 @@ export interface DelegateOptions {
 }
 
 export interface Delegate extends DelegateOptions {
+  beginData(pos: Position): void;
+  appendToData(pos: Position, char: Char): void;
   finishData(pos: Position): void;
   finishAttributeName(pos: Position): void;
   voidAttributeValue(pos: Position): void;
   whitespace(pos: Position, char: string): void;
   appendToCommentData(pos: Position, char: string): void;
-  beginData(pos: Position): void;
-  appendToData(pos: Position, char: Char): void;
   openTag(pos: Position, kind: 'start' | 'end'): void;
   beginTagName(pos: Position): void;
   appendToTagName(pos: Position, char: string): void;

@@ -411,7 +411,7 @@ QUnit.assert.events = function(_expected: (Event<opaque> | EventGroup)[], messag
 
   var actualStrings = events.map(format);
 
-  this.push(QUnit.equiv(actualStrings, expectedStrings), actualStrings, expectedStrings, message);
+  QUnit.push(QUnit.equiv(actualStrings, expectedStrings), actualStrings, expectedStrings, message);
 }
 
 QUnit.module("simple-html-tokenizer - EventedTokenizer", {
