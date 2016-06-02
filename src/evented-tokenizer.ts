@@ -8,7 +8,7 @@ function wrapDelegate(tokenizer: EventedTokenizer, innerDelegate: DelegateOption
     'reset', 'whitespace',
     'beginData', 'appendToData', 'finishData',
     'beginComment', 'appendToCommentData', 'finishComment',
-    'openTag', 'beginTagName', 'appendToTagName', 'finishTagName', 'finishTag',
+    'openStartTag', 'openEndTag', 'beginTagName', 'appendToTagName', 'finishTagName', 'finishTag',
     'beginAttributeName', 'appendToAttributeName', 'finishAttributeName', 'beginWholeAttributeValue', 'beginAttributeValue', 'appendToAttributeValue', 'finishAttributeValue', 'finishWholeAttributeValue', 'voidAttributeValue',
   ];
 
@@ -37,7 +37,8 @@ export interface DelegateOptions {
   voidAttributeValue?(pos: Position): void;
   whitespace?(pos: Position, char: string): void;
   appendToCommentData?(pos: Position, char: string): void;
-  openTag?(pos: Position, kind: 'start' | 'end'): void;
+  openStartTag?(pos: Position): void;
+  openEndTag?(pos: Position): void;
   beginTagName?(pos: Position): void;
   appendToTagName?(pos: Position, char: string): void;
   beginComment?(pos: Position): void;
@@ -52,7 +53,6 @@ export interface DelegateOptions {
   appendToAttributeValue?(pos: Position, char: Char): void;
   finishAttributeValue?(pos: Position, quoted: boolean): void;
   finishWholeAttributeValue?(pos: Position): void;
-  [index: string]: (pos: Position, ...args: any[]) => void;
 }
 
 export interface Delegate extends DelegateOptions {
@@ -63,12 +63,12 @@ export interface Delegate extends DelegateOptions {
   voidAttributeValue(pos: Position): void;
   whitespace(pos: Position, char: string): void;
   appendToCommentData(pos: Position, char: string): void;
-  openTag(pos: Position, kind: 'start' | 'end'): void;
+  openStartTag(pos: Position): void;
+  openEndTag(pos: Position): void;
   beginTagName(pos: Position): void;
   appendToTagName(pos: Position, char: string): void;
   beginComment(pos: Position): void;
   finishComment(pos: Position): void;
-  appendToCommentData(pos: Position, char: string): void;
   finishTagName(pos: Position): void;
   finishTag(pos: Position, selfClosing: boolean): void;
   beginAttributeName(pos: Position): void;
@@ -307,7 +307,7 @@ const TagOpen: State = {
       t.consume();
     } else if (isAlpha(char)) {
       t.state = TagName;
-      t.delegate.openTag(unwrap(t.marked.tagStart), 'start');
+      t.delegate.openStartTag(unwrap(t.marked.tagStart));
       t.delegate.beginTagName(t);
       t.delegate.appendToTagName(t, char.toLowerCase());
       t.consume();
@@ -675,7 +675,7 @@ const EndTagOpen: State = {
 
     if (isAlpha(char)) {
       t.state = TagName;
-      t.delegate.openTag(unwrap(t.marked.tagStart), 'end');
+      t.delegate.openEndTag(unwrap(t.marked.tagStart));
       t.delegate.beginTagName(t);
       t.delegate.appendToTagName(t, char.toLowerCase());
       t.consume();

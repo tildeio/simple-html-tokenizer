@@ -140,7 +140,7 @@ export default class Tokenizer implements DelegateOptions {
   appendToData(pos: Position, char: Char) {
     let chars = typeof char === 'string' ? char : char.chars;
 
-    unwrapAsToken<CharsToken>(this.token, 'Chars').chars += chars;  
+    unwrapAsToken<CharsToken>(this.token, 'Chars').chars += chars;
   }
 
   finishData() {
@@ -170,7 +170,7 @@ export default class Tokenizer implements DelegateOptions {
 
   openTag(pos: Position, kind: 'start' | 'end') {
     let token: Token;
-    
+
     if (kind === 'start') {
       token = this.token = {
         loc: null,
@@ -178,7 +178,7 @@ export default class Tokenizer implements DelegateOptions {
         tagName: '',
         attributes: [],
         selfClosing: false
-      } as StartTagToken;      
+      } as StartTagToken;
     } else {
       token = this.token = {
         loc: null,
