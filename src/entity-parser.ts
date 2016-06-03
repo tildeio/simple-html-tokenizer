@@ -25,6 +25,6 @@ export default class EntityParser {
     matches = entity.match(NAMED);
     if (matches) {
       return this.named[matches[1]];
-    }    
+    }
   }
 }

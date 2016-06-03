@@ -5,6 +5,7 @@
         "isolatedModules": false,
         "inlineSourceMap": true,
         "inlineSources": true,
+        "strictNullChecks": true,
         "moduleResolution": "node",
         "noImplicitAny": true,
         "rootDir": "./",
@@ -18,6 +19,6 @@
     "exclude": [
         "tmp",
         "node_modules",
-        "dist"        
+        "dist"
     ]
 }

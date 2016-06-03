@@ -1,5 +1,5 @@
 import { Option, opaque, unwrap, preprocessInput, isAlpha, isSpace } from './utils';
-import EntityParser from './entity-parser'; 
+import EntityParser from './entity-parser';
 
 function noop() {}
 
@@ -106,6 +106,7 @@ export default class EventedTokenizer {
   public tagColumn: Option<number> = null;
   public bufferedWhitespace: [Position, string][] = [];
   public bufferedData: [Position, string][] = [];
+  public delegate: Delegate;
   public line = 1;
   public column = 0;
 
@@ -115,9 +116,9 @@ export default class EventedTokenizer {
     commentEnd: null,
     slash: null,
     charRef: null
-  }
+  };
 
-  constructor(public delegate: DelegateOptions, public entityParser: EntityParser, public input: string = '') {
+  constructor(delegate: DelegateOptions, public entityParser: EntityParser, public input: string = '') {
     this.delegate = wrapDelegate(this, delegate);
     this.entityParser = entityParser;
     this.state = BeforeData;
@@ -273,7 +274,7 @@ const BeforeData: State = {
       t.state = Data;
       t.delegate.beginData(t);
     }
-  }  
+  }
 }
 
 const Data: State = {
@@ -312,7 +313,7 @@ const TagOpen: State = {
       t.delegate.appendToTagName(t, char.toLowerCase());
       t.consume();
     }
-  }  
+  }
 };
 
 const MarkupDeclaration: State = {
@@ -558,7 +559,7 @@ const BeforeAttributeValue: State = {
       t.state = BeforeData;
     } else {
       t.state = AttributeValueUnquoted;
-      t.delegate.beginWholeAttributeValue(t);        
+      t.delegate.beginWholeAttributeValue(t);
       t.delegate.beginAttributeValue(t, false);
       t.delegate.appendToAttributeValue(t, char);
       t.consume();
@@ -680,5 +681,5 @@ const EndTagOpen: State = {
       t.delegate.appendToTagName(t, char.toLowerCase());
       t.consume();
     }
-  }  
+  }
 };

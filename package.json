@@ -11,8 +11,8 @@
     "type": "git",
     "url": "https://github.com/tildeio/simple-html-tokenizer.git"
   },
-  "main": "lib/index.js",
-  "jsnext:main": "lib/simple-html-tokenizer.js",
+  "main": "dist/es5/simple-html-tokenizer.js",
+  "jsnext:main": "dist/es6/simple-html-tokenizer/index.js",
   "typings": "src/index.d.ts",
   "scripts": {
     "test": "testem ci",

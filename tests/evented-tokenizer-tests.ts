@@ -169,7 +169,7 @@ class AttributeName extends EventGroup {
 class StartAttributeValue extends EventGroup {
   constructor(quote: string) {
     super();
-    
+
     this.add(e.beginWholeAttributeValue());
 
     if (quote) this.add(e.whitespace(quote));
@@ -202,7 +202,7 @@ class AttributeValue extends EventGroup {
 
     this.add(e.finishAttributeValue(!!quote));
     if (quote) this.add(e.whitespace(quote));
-    this.add(e.finishWholeAttributeValue());  
+    this.add(e.finishWholeAttributeValue());
   }
 }
 
@@ -226,7 +226,7 @@ class AttributeValueEntity extends EventGroup {
 class Whitespace extends EventGroup {
   constructor(chars: string) {
     super();
-    
+
     for (var i=0; i<chars.length; i++) {
       this.add(e.whitespace(chars[i]))
     }
@@ -477,7 +477,7 @@ QUnit.test("A pair of hyphenated tags", function(assert) {
     e.finishTag(),
     e.openTag('end'),
     new TagName('x-foo'),
-    e.finishTag()    
+    e.finishTag()
   ]);
 });
 
@@ -555,7 +555,7 @@ QUnit.test("A tag with valueless attributes", function(assert) {
 
 QUnit.test("A tag with multiple attributes", function(assert) {
   tokenize('<div id=foo class="bar baz" href=\'bat\'>');
-  
+
   assert.events([
     e.openTag('start'),
     new TagName('div'),
@@ -571,7 +571,7 @@ QUnit.test("A tag with multiple attributes", function(assert) {
     new AttributeName('href'),
     new Whitespace('='),
     new AttributeValue('bat', "'"),
-    e.finishTag()    
+    e.finishTag()
   ]);
 });
 
@@ -853,7 +853,7 @@ QUnit.test("tokens: Chars start-tag Chars start-tag", function(assert) {
     e.finishTag(),
     e.beginData(),
     new DataChars('Chars\n'),
-    e.finishData(),    
+    e.finishData(),
     e.openTag('start'),
     new TagName('div'),
     e.finishTag()
