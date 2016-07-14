@@ -4,7 +4,7 @@ var eventNames = [
   'reset', 'whitespace',
   'beginData', 'appendToData', 'finishData',
   'beginComment', 'appendToCommentData', 'finishComment',
-  'openTag', 'beginTagName', 'appendToTagName', 'finishTagName', 'finishTag',
+  'openStartTag', 'openEndTag', 'beginTagName', 'appendToTagName', 'finishTagName', 'finishTag',
   'beginAttributeName', 'appendToAttributeName', 'finishAttributeName', 'beginWholeAttributeValue', 'beginAttributeValue', 'appendToAttributeValue', 'finishAttributeValue', 'finishWholeAttributeValue', 'voidAttributeValue',
 ];
 
@@ -189,7 +189,7 @@ class FinishAttributeValue extends EventGroup {
 }
 
 class AttributeValue extends EventGroup {
-  constructor(chars: string, quote: string) {
+  constructor(chars: string, quote: string | null) {
     super();
 
     this.add(e.beginWholeAttributeValue());
@@ -303,10 +303,15 @@ class Events {
     return ['finishComment', this.pos()];
   }
 
-  openTag(kind: 'start' | 'end'): Event<'start' | 'end'> {
+  openStartTag(): SimpleEvent {
     let pos = this.advance('<');
-    if (kind === 'end') this.advance('/');
-    return ['openTag', pos, kind];
+    return ['openStartTag', pos];
+  }
+
+  openEndTag(): SimpleEvent {
+    let pos = this.advance('<');
+    this.advance('/');
+    return ['openEndTag', pos];
   }
 
   beginTagName(): SimpleEvent {
@@ -411,7 +416,7 @@ QUnit.assert.events = function(_expected: (Event<opaque> | EventGroup)[], messag
 
   var actualStrings = events.map(format);
 
-  QUnit.push(QUnit.equiv(actualStrings, expectedStrings), actualStrings, expectedStrings, message);
+  QUnit.push(QUnit.equiv(actualStrings, expectedStrings), actualStrings, expectedStrings, message || "mismatched events");
 }
 
 QUnit.module("simple-html-tokenizer - EventedTokenizer", {
@@ -430,7 +435,7 @@ QUnit.test("A simple tag", function(assert) {
   tokenize("<div>");
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     e.finishTag()
   ]);
@@ -440,7 +445,7 @@ QUnit.test("A simple tag with trailing spaces", function(assert) {
   tokenize("<div   \t\n>");
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     new Whitespace('   \t\n'),
     e.finishTag()
@@ -451,7 +456,7 @@ QUnit.test("A simple closing tag", function(assert) {
   tokenize("</div>");
 
   assert.events([
-    e.openTag('end'),
+    e.openEndTag(),
     new TagName('div'),
     e.finishTag()
   ]);
@@ -461,7 +466,7 @@ QUnit.test("A simple closing tag with trailing spaces", function(assert) {
   tokenize("</div   \t\n>");
 
   assert.events([
-    e.openTag('end'),
+    e.openEndTag(),
     new TagName('div'),
     new Whitespace('   \t\n'),
     e.finishTag()
@@ -472,10 +477,10 @@ QUnit.test("A pair of hyphenated tags", function(assert) {
   tokenize("<x-foo></x-foo>");
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('x-foo'),
     e.finishTag(),
-    e.openTag('end'),
+    e.openEndTag(),
     new TagName('x-foo'),
     e.finishTag()
   ]);
@@ -485,7 +490,7 @@ QUnit.test("A tag with a single-quoted attribute", function(assert) {
   tokenize("<div id='foo'>");
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     new Whitespace(' '),
     new AttributeName('id'),
@@ -499,7 +504,7 @@ QUnit.test("A tag with a double-quoted attribute", function(assert) {
   tokenize('<div id="foo">');
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     new Whitespace(' '),
     new AttributeName('id'),
@@ -513,7 +518,7 @@ QUnit.test("A tag with a double-quoted empty", function(assert) {
   tokenize('<div id="">');
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     new Whitespace(' '),
     new AttributeName('id'),
@@ -527,7 +532,7 @@ QUnit.test("A tag with unquoted attribute", function(assert) {
   tokenize('<div id=foo>');
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     new Whitespace(' '),
     new AttributeName('id'),
@@ -541,7 +546,7 @@ QUnit.test("A tag with valueless attributes", function(assert) {
   tokenize('<div foo bar>');
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     new Whitespace(' '),
     new AttributeName('foo'),
@@ -557,7 +562,7 @@ QUnit.test("A tag with multiple attributes", function(assert) {
   tokenize('<div id=foo class="bar baz" href=\'bat\'>');
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     new Whitespace(' '),
     new AttributeName('id'),
@@ -579,7 +584,7 @@ QUnit.test("A tag with capitalization in attributes", function(assert) {
   tokenize('<svg viewBox="0 0 0 0">');
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('svg'),
     new Whitespace(' '),
     new AttributeName('viewBox'),
@@ -593,7 +598,7 @@ QUnit.test("A tag with capitalization in the tag", function(assert) {
   tokenize('<linearGradient>');
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('linearGradient'),
     e.finishTag()
   ]);
@@ -603,7 +608,7 @@ QUnit.test("A self-closing tag", function(assert) {
   tokenize('<img />');
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('img'),
     new Whitespace(' '),
     e.finishTag(true)
@@ -614,7 +619,7 @@ QUnit.test("A self-closing tag with valueless attributes (regression)", function
   tokenize('<input disabled />');
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('input'),
     new Whitespace(' '),
     new AttributeName('disabled'),
@@ -628,7 +633,7 @@ QUnit.test("A self-closing tag with valueless attributes without space before cl
   tokenize('<input disabled/>');
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('input'),
     new Whitespace(' '),
     new AttributeName('disabled'),
@@ -641,7 +646,7 @@ QUnit.test("A tag with a / in the middle", function(assert) {
   tokenize('<img / src="foo.png">');
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('img'),
     new Whitespace(' / '),
     new AttributeName('src'),
@@ -655,7 +660,7 @@ QUnit.test("An opening and closing tag with some content", function(assert) {
   tokenize("<div id='foo' class='{{bar}} baz'>Some content</div>");
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     new Whitespace(' '),
     new AttributeName('id'),
@@ -667,7 +672,7 @@ QUnit.test("An opening and closing tag with some content", function(assert) {
     new AttributeValue('{{bar}} baz', "'"),
     e.finishTag(),
     new Data('Some content'),
-    e.openTag('end'),
+    e.openEndTag(),
     new TagName('div'),
     e.finishTag()
   ]);
@@ -750,7 +755,7 @@ QUnit.test("Character refs in attributes", function(assert) {
   var Chars = AttributeValueChars;
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     new Whitespace(' '),
     new AttributeName('title'),
@@ -806,7 +811,7 @@ QUnit.test("tokens: Chars start-tag Chars", function(assert) {
     e.beginData(),
     new DataChars("Chars"),
     e.finishData(),
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     e.finishTag(),
     e.beginData(),
@@ -819,10 +824,10 @@ QUnit.test("tokens: start-tag start-tag", function(assert) {
   tokenize("<div><div>");
 
   assert.events([
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     e.finishTag(),
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     e.finishTag(),
   ]);
@@ -835,7 +840,7 @@ QUnit.test("tokens: html char ref start-tag", function(assert) {
     e.beginData(),
     new DataEntity('>', '&gt;'),
     e.finishData(),
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     e.finishTag()
   ]);
@@ -848,13 +853,13 @@ QUnit.test("tokens: Chars start-tag Chars start-tag", function(assert) {
     e.beginData(),
     new DataChars('Chars\n'),
     e.finishData(),
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     e.finishTag(),
     e.beginData(),
     new DataChars('Chars\n'),
     e.finishData(),
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     e.finishTag()
   ]);
@@ -865,7 +870,7 @@ QUnit.test("tokens: comment start-tag Chars end-tag", function(assert) {
 
   assert.events([
     new Comment(' multline\ncomment '),
-    e.openTag('start'),
+    e.openStartTag(),
     new TagName('div'),
     new Whitespace(' '),
     new AttributeName('foo'),
@@ -873,7 +878,7 @@ QUnit.test("tokens: comment start-tag Chars end-tag", function(assert) {
     new AttributeValue('bar', null),
     e.finishTag(),
     new Data('Chars\n'),
-    e.openTag('end'),
+    e.openEndTag(),
     new TagName('div'),
     e.finishTag()
   ]);

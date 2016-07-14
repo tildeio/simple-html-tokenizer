@@ -168,35 +168,26 @@ export default class Tokenizer implements DelegateOptions {
 
   // Tags - basic
 
-  openTag(pos: Position, kind: 'start' | 'end') {
-    let token: Token;
-
-    if (kind === 'start') {
-      token = this.token = {
-        loc: null,
-        type: 'StartTag',
-        tagName: '',
-        attributes: [],
-        selfClosing: false
-      } as StartTagToken;
-    } else {
-      token = this.token = {
-        loc: null,
-        type: 'EndTag',
-        tagName: ''
-      } as EndTagToken
-    }
+  openStartTag(pos: Position) {
+    let token = this.token = {
+      loc: null,
+      type: 'StartTag',
+      tagName: '',
+      attributes: [],
+      selfClosing: false
+    } as StartTagToken;
 
     this.tokens.push(token);
   }
 
-  beginEndTag(pos: Position) {
-    this.token = {
+  openEndTag(pos: Position) {
+    let token = this.token = {
       loc: null,
       type: 'EndTag',
       tagName: ''
     } as EndTagToken;
-    this.tokens.push(this.token);
+
+    this.tokens.push(token);
   }
 
   finishTag(pos: Position, selfClosing: boolean) {
