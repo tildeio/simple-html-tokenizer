@@ -1,39 +1,71 @@
 import EventedTokenizer from './evented-tokenizer';
 
-function Tokenizer(entityParser, options) {
-  this.token = null;
-  this.startLine = 1;
-  this.startColumn = 0;
-  this.options = options || {};
-  this.tokenizer = new EventedTokenizer(this, entityParser);
+export interface TokenizerOptions {
+  loc?: any;
+};
+
+export type Attribute = [string, string, boolean];
+
+export interface Token {
+  type: string;
+  chars?: string;
+  attributes?: Attribute[];
+  tagName?: string;
+  selfClosing?: boolean;
+  loc?: {
+    start: {
+      line: number;
+      column: number;
+    },
+    end: {
+      line: number;
+      column: number;
+    }
+  };
 }
 
-Tokenizer.prototype = {
-  tokenize: function(input) {
-    this.tokens = [];
-    this.tokenizer.tokenize(input);
-    return this.tokens;
-  },
+export default class Tokenizer {
+  private token: Token;
+  private startLine: number;
+  private startColumn: number;
+  private options: TokenizerOptions;
+  private tokenizer: EventedTokenizer;
+  private tokens: Token[] = [];
+  private currentAttribute: Attribute = null;
 
-  tokenizePart: function(input) {
-    this.tokens = [];
-    this.tokenizer.tokenizePart(input);
-    return this.tokens;
-  },
-
-  tokenizeEOF: function() {
-    this.tokens = [];
-    this.tokenizer.tokenizeEOF();
-    return this.tokens[0];
-  },
-
-  reset: function() {
+  constructor(entityParser, options: TokenizerOptions = {}) {
     this.token = null;
     this.startLine = 1;
     this.startColumn = 0;
-  },
+    this.options = options;
+    this.tokenizer = new EventedTokenizer(this, entityParser);
+  }
 
-  addLocInfo: function() {
+  tokenize(input) {
+    this.tokens = [];
+    this.tokenizer.tokenize(input);
+    return this.tokens;
+  }
+
+  tokenizePart(input) {
+    this.tokens = [];
+    this.tokenizer.tokenizePart(input);
+    return this.tokens;
+  }
+
+  tokenizeEOF() {
+    this.tokens = [];
+    this.tokenizer.tokenizeEOF();
+    return this.tokens[0];
+  }
+
+  reset() {
+    this.token = null;
+    this.startLine = 1;
+    this.startColumn = 0;
+  }
+
+  addLocInfo() {
     if (this.options.loc) {
       this.token.loc = {
         start: {
@@ -48,47 +80,47 @@ Tokenizer.prototype = {
     }
     this.startLine = this.tokenizer.line;
     this.startColumn = this.tokenizer.column;
-  },
+  }
 
   // Data
 
-  beginData: function() {
+  beginData() {
     this.token = {
       type: 'Chars',
       chars: ''
     };
     this.tokens.push(this.token);
-  },
+  }
 
-  appendToData: function(char) {
+  appendToData(char) {
     this.token.chars += char;
-  },
+  }
 
-  finishData: function() {
+  finishData() {
     this.addLocInfo();
-  },
+  }
 
   // Comment
 
-  beginComment: function() {
+  beginComment() {
     this.token = {
       type: 'Comment',
       chars: ''
     };
     this.tokens.push(this.token);
-  },
+  }
 
-  appendToCommentData: function(char) {
+  appendToCommentData(char) {
     this.token.chars += char;
-  },
+  }
 
-  finishComment: function() {
+  finishComment() {
     this.addLocInfo();
-  },
+  }
 
   // Tags - basic
 
-  beginStartTag: function() {
+  beginStartTag() {
     this.token = {
       type: 'StartTag',
       tagName: '',
@@ -96,56 +128,54 @@ Tokenizer.prototype = {
       selfClosing: false
     };
     this.tokens.push(this.token);
-  },
+  }
 
-  beginEndTag: function() {
+  beginEndTag() {
     this.token = {
       type: 'EndTag',
       tagName: ''
     };
     this.tokens.push(this.token);
-  },
+  }
 
-  finishTag: function() {
+  finishTag() {
     this.addLocInfo();
-  },
+  }
 
-  markTagAsSelfClosing: function() {
+  markTagAsSelfClosing() {
     this.token.selfClosing = true;
-  },
+  }
 
   // Tags - name
 
-  appendToTagName: function(char) {
+  appendToTagName(char) {
     this.token.tagName += char;
-  },
+  }
 
   // Tags - attributes
 
-  beginAttribute: function() {
-    this._currentAttribute = ["", "", null];
-    this.token.attributes.push(this._currentAttribute);
-  },
+  beginAttribute() {
+    this.currentAttribute = ["", "", null];
+    this.token.attributes.push(this.currentAttribute);
+  }
 
-  appendToAttributeName: function(char) {
-    this._currentAttribute[0] += char;
-  },
+  appendToAttributeName(char) {
+    this.currentAttribute[0] += char;
+  }
 
-  beginAttributeValue: function(isQuoted) {
-    this._currentAttribute[2] = isQuoted;
-  },
+  beginAttributeValue(isQuoted) {
+    this.currentAttribute[2] = isQuoted;
+  }
 
-  appendToAttributeValue: function(char) {
-    this._currentAttribute[1] = this._currentAttribute[1] || "";
-    this._currentAttribute[1] += char;
-  },
+  appendToAttributeValue(char) {
+    this.currentAttribute[1] = this.currentAttribute[1] || "";
+    this.currentAttribute[1] += char;
+  }
 
-  finishAttributeValue: function() {
-  },
+  finishAttributeValue() {
+  }
 
-  reportSyntaxError: function(message) {
+  reportSyntaxError(message) {
     this.token.syntaxError = message;
   }
-};
-
-export default Tokenizer;
+}

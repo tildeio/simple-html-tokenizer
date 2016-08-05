@@ -1,23 +1,32 @@
 import { preprocessInput, isAlpha, isSpace } from './utils';
 
-function EventedTokenizer(delegate, entityParser) {
-  this.delegate = delegate;
-  this.entityParser = entityParser;
+export default class EventedTokenizer {
+  private delegate: any;
+  private entityParser: any;
+  private state: any;
+  private input: any;
+  private index: number;
+  private tagLine: number;
+  private tagColumn: number;
 
-  this.state = null;
-  this.input = null;
+  public line: number;
+  public column: number;
 
-  this.index = -1;
-  this.line = -1;
-  this.column = -1;
-  this.tagLine = -1;
-  this.tagColumn = -1;
+  constructor(delegate, entityParser) {
+    this.delegate = delegate;
+    this.entityParser = entityParser;
 
-  this.reset();
-}
+    this.state = null;
+    this.input = null;
 
-EventedTokenizer.prototype = {
-  reset: function() {
+    this.index = -1;
+    this.line = -1;
+    this.column = -1;
+    this.tagLine = -1;
+    this.tagColumn = -1;
+  }
+
+  reset() {
     this.state = 'beforeData';
     this.input = '';
 
@@ -29,38 +38,38 @@ EventedTokenizer.prototype = {
     this.tagColumn = -1;
 
     this.delegate.reset();
-  },
+  }
 
-  tokenize: function(input) {
+  tokenize(input) {
     this.reset();
     this.tokenizePart(input);
     this.tokenizeEOF();
-  },
+  }
 
-  tokenizePart: function(input) {
+  tokenizePart(input) {
     this.input += preprocessInput(input);
 
     while (this.index < this.input.length) {
       this.states[this.state].call(this);
     }
-  },
+  }
 
-  tokenizeEOF: function() {
+  tokenizeEOF() {
     this.flushData();
-  },
+  }
 
-  flushData: function() {
+  flushData() {
     if (this.state === 'data') {
       this.delegate.finishData();
       this.state = 'beforeData';
     }
-  },
+  }
 
-  peek: function() {
+  peek() {
     return this.input.charAt(this.index);
-  },
+  }
 
-  consume: function() {
+  consume() {
     let char = this.peek();
 
     this.index++;
@@ -73,9 +82,9 @@ EventedTokenizer.prototype = {
     }
 
     return char;
-  },
+  }
 
-  consumeCharRef: function() {
+  consumeCharRef() {
     let endIndex = this.input.indexOf(';', this.index);
     if (endIndex === -1) {
       return;
@@ -94,9 +103,9 @@ EventedTokenizer.prototype = {
 
       return chars;
     }
-  },
+  }
 
-  markTagStart: function() {
+  markTagStart() {
     // these properties to be removed in next major bump
     this.tagLine = this.line;
     this.tagColumn = this.column;
@@ -104,10 +113,10 @@ EventedTokenizer.prototype = {
     if (this.delegate.tagOpen) {
       this.delegate.tagOpen();
     }
-  },
+  }
 
-  states: {
-    beforeData: function() {
+  states = {
+    beforeData() {
       let char = this.peek();
 
       if (char === "<") {
@@ -120,7 +129,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    data: function() {
+    data() {
       let char = this.peek();
 
       if (char === "<") {
@@ -137,7 +146,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    tagOpen: function() {
+    tagOpen() {
       let char = this.consume();
 
       if (char === "!") {
@@ -151,7 +160,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    markupDeclaration: function() {
+    markupDeclaration() {
       let char = this.consume();
 
       if (char === "-" && this.input.charAt(this.index) === "-") {
@@ -161,7 +170,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    commentStart: function() {
+    commentStart() {
       let char = this.consume();
 
       if (char === "-") {
@@ -175,7 +184,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    commentStartDash: function() {
+    commentStartDash() {
       let char = this.consume();
 
       if (char === "-") {
@@ -189,7 +198,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    comment: function() {
+    comment() {
       let char = this.consume();
 
       if (char === "-") {
@@ -199,7 +208,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    commentEndDash: function() {
+    commentEndDash() {
       let char = this.consume();
 
       if (char === "-") {
@@ -210,7 +219,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    commentEnd: function() {
+    commentEnd() {
       let char = this.consume();
 
       if (char === ">") {
@@ -222,7 +231,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    tagName: function() {
+    tagName() {
       let char = this.consume();
 
       if (isSpace(char)) {
@@ -237,7 +246,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    beforeAttributeName: function() {
+    beforeAttributeName() {
       let char = this.peek();
 
       if (isSpace(char)) {
@@ -262,7 +271,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    attributeName: function() {
+    attributeName() {
       let char = this.peek();
 
       if (isSpace(char)) {
@@ -292,7 +301,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    afterAttributeName: function() {
+    afterAttributeName() {
       let char = this.peek();
 
       if (isSpace(char)) {
@@ -322,7 +331,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    beforeAttributeValue: function() {
+    beforeAttributeValue() {
       let char = this.peek();
 
       if (isSpace(char)) {
@@ -349,7 +358,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    attributeValueDoubleQuoted: function() {
+    attributeValueDoubleQuoted() {
       let char = this.consume();
 
       if (char === '"') {
@@ -362,7 +371,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    attributeValueSingleQuoted: function() {
+    attributeValueSingleQuoted() {
       let char = this.consume();
 
       if (char === "'") {
@@ -375,7 +384,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    attributeValueUnquoted: function() {
+    attributeValueUnquoted() {
       let char = this.peek();
 
       if (isSpace(char)) {
@@ -396,7 +405,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    afterAttributeValueQuoted: function() {
+    afterAttributeValueQuoted() {
       let char = this.peek();
 
       if (isSpace(char)) {
@@ -414,7 +423,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    selfClosingStartTag: function() {
+    selfClosingStartTag() {
       let char = this.peek();
 
       if (char === ">") {
@@ -427,7 +436,7 @@ EventedTokenizer.prototype = {
       }
     },
 
-    endTagOpen: function() {
+    endTagOpen() {
       let char = this.consume();
 
       if (isAlpha(char)) {
@@ -436,7 +445,5 @@ EventedTokenizer.prototype = {
         this.delegate.appendToTagName(char.toLowerCase());
       }
     }
-  }
-};
-
-export default EventedTokenizer;
+  };
+}
