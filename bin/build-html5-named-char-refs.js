@@ -2,7 +2,7 @@
 var http = require('http');
 var fs = require('fs');
 
-var outFile = require('path').resolve(__dirname, '../lib/simple-html-tokenizer/html5-named-char-refs.js');
+var outFile = require('path').resolve(__dirname, '../lib/simple-html-tokenizer/html5-named-char-refs.ts');
 
 console.log('downloading html5 entities.json');
 http.get("http://www.w3.org/TR/html5/entities.json", function(res) {

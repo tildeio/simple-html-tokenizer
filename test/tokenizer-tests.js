@@ -1,4 +1,12 @@
-/* global HTML5Tokenizer: false */
+/*globals global, require */
+
+var HTML5Tokenizer;
+try {
+  HTML5Tokenizer = require('simple-html-tokenizer');
+} catch(e) {
+  HTML5Tokenizer = global.HTML5Tokenizer;
+}
+
 QUnit.module("simple-html-tokenizer - tokenizer");
 
 QUnit.test("Simple content", function(assert) {

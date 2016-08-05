@@ -1,12 +1,12 @@
 import EventedTokenizer from './evented-tokenizer';
 
-interface TokenizerOptions {
+export interface TokenizerOptions {
   loc?: any;
 }
 
-type Attribute = [string, string, boolean]
+export type Attribute = [string, string, boolean]
 
-interface Token {
+export interface Token {
   type: string;
   chars?: string;
   attributes?: Attribute[];
@@ -24,7 +24,7 @@ interface Token {
   }
 }
 
-class Tokenizer {
+export default class Tokenizer {
   private token: Token;
   private startLine: number;
   private startColumn: number;
@@ -175,5 +175,3 @@ class Tokenizer {
   finishAttributeValue() {
   }
 }
-
-export default Tokenizer;
