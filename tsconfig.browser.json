@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "target": "es5",
+    "module": "amd",
+    "outFile": "dist/amd/simple-html-tokenizer.js",
+    "outDir": "dist/amd",
+    "sourceMap": true
+  }
+}
