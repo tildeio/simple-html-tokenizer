@@ -250,11 +250,15 @@ EventedTokenizer.prototype = {
         this.consume();
         this.delegate.finishTag();
         this.state = 'beforeData';
-      } else {
+      } else if (char === '=') {
+        this.delegate.reportSyntaxError("attribute name cannot start with equals sign");
         this.state = 'attributeName';
         this.delegate.beginAttribute();
         this.consume();
         this.delegate.appendToAttributeName(char);
+      } else {
+        this.state = 'attributeName';
+        this.delegate.beginAttribute();
       }
     },
 
@@ -278,6 +282,10 @@ EventedTokenizer.prototype = {
         this.consume();
         this.delegate.finishTag();
         this.state = 'beforeData';
+      } else if (char === '"' || char === "'" || char === '<') {
+        this.delegate.reportSyntaxError(char + " is not a valid character within attribute names");
+        this.consume();
+        this.delegate.appendToAttributeName(char);
       } else {
         this.consume();
         this.delegate.appendToAttributeName(char);

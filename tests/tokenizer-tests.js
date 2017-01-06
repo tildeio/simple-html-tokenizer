@@ -82,6 +82,25 @@ QUnit.test("A tag with valueless attributes", function(assert) {
   ]);
 });
 
+QUnit.test("Missing attribute name", function(assert) {
+  var tokens = HTML5Tokenizer.tokenize('<div =foo>');
+  assert.deepEqual(tokens, [
+    withSyntaxError("attribute name cannot start with equals sign", startTag("div", [
+      ['=foo', "", false]
+    ]))
+  ]);
+
+});
+
+QUnit.test("Invalid character in attribute name", function(assert) {
+  var tokens = HTML5Tokenizer.tokenize('<div ">');
+  assert.deepEqual(tokens, [
+    withSyntaxError("\" is not a valid character within attribute names", startTag("div", [
+      ['"', "", false]
+    ]))
+  ]);
+});
+
 QUnit.test("A tag with multiple attributes", function(assert) {
   var tokens = HTML5Tokenizer.tokenize('<div id=foo class="bar baz" href=\'bat\'>');
   assert.deepEqual(tokens, [
@@ -310,4 +329,9 @@ function locInfo(token, startLine, startColumn, endLine, endColumn) {
   };
 
   return token;
+}
+
+function withSyntaxError(message, result) {
+  result.syntaxError = message;
+  return result;
 }
