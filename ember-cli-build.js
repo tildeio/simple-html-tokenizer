@@ -20,7 +20,12 @@ module.exports = function(/* defaults */) {
   });
 
   var tests = new Funnel('test', {
-    files: ['index.html', 'tokenizer-tests.js'],
+    files: ['tokenizer-tests.js'],
+    destDir: '/tests'
+  });
+
+  var testSupport = new Funnel('test', {
+    files: ['index.html'],
     destDir: '/tests'
   });
 
@@ -30,5 +35,5 @@ module.exports = function(/* defaults */) {
     destDir: '/tests'
   });
 
-  return new MergeTrees([bundled, tests, qunit]);
+  return new MergeTrees([bundled, tests, testSupport, qunit]);
 };
