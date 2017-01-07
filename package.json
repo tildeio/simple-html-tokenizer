@@ -12,7 +12,7 @@
     "url": "https://github.com/tildeio/simple-html-tokenizer.git"
   },
   "main": "dist/simple-html-tokenizer.js",
-  "jsnext:main": "lib/simple-html-tokenizer/index.js",
+  "jsnext:main": "src/index.js",
   "scripts": {
     "build": "ember build",
     "prepublish": "npm run build",

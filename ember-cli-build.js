@@ -5,14 +5,14 @@ var MergeTrees = require('broccoli-merge-trees');
 var concat = require('broccoli-concat');
 
 module.exports = function(/* defaults */) {
-  var lib = new Funnel('lib/simple-html-tokenizer', {
+  var src = new Funnel('src', {
     include: ['**/*.js'],
-    destDir: '/lib/simple-html-tokenizer'
+    destDir: '/src'
   });
 
-  var bundled = new Rollup(lib, {
+  var bundled = new Rollup(src, {
     rollup: {
-      entry: 'lib/simple-html-tokenizer/index.js',
+      entry: 'src/index.js',
 
       sourceMap: true,
       dest: 'simple-html-tokenizer.js',
@@ -26,10 +26,10 @@ module.exports = function(/* defaults */) {
     destDir: '/test'
   });
 
-  var libJSHint = new JSHint(lib);
+  var srcJSHint = new JSHint(src);
   var testsJSHint = new JSHint(tests);
 
-  var allTests = concat(new MergeTrees([tests, libJSHint, testsJSHint]), {
+  var allTests = concat(new MergeTrees([tests, srcJSHint, testsJSHint]), {
     outputFile: '/tests/tests.js',
     inputFiles: ['**/*.js'],
   });
