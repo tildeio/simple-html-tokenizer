@@ -3,9 +3,14 @@ var Rollup = require('broccoli-rollup');
 var MergeTrees = require('broccoli-merge-trees');
 
 module.exports = function(/* defaults */) {
-  var tokenizer = new Rollup('lib', {
+  var lib = new Funnel('lib/simple-html-tokenizer', {
+    include: ['**/*.js'],
+    destDir: '/'
+  });
+
+  var bundled = new Rollup(lib, {
     rollup: {
-      entry: 'simple-html-tokenizer/index.js',
+      entry: 'index.js',
 
       sourceMap: true,
       dest: 'simple-html-tokenizer.js',
@@ -25,5 +30,5 @@ module.exports = function(/* defaults */) {
     destDir: '/tests'
   });
 
-  return new MergeTrees([tokenizer, tests, qunit]);
+  return new MergeTrees([bundled, tests, qunit]);
 };
