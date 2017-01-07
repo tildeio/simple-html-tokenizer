@@ -5,3 +5,5 @@
 /.npmignore
 /.travis.yml
 /testem.json
+/tmp
+/ember-cli-build.js

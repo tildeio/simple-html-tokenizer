@@ -1,7 +1,7 @@
 {
   "test_page": "test/index.html",
   "parallel": 5,
-  "before_tests": "bin/build.js",
+  "before_tests": "ember build",
   "launchers": {
     "Node": {
       "command": "bin/test.js testem",
