@@ -17,7 +17,7 @@
     "build": "ember build",
     "prepublish": "npm run build",
     "test": "ember test",
-    "lint": "jshint bin lib test"
+    "lint": "jshint commands lib test"
   },
   "devDependencies": {
     "broccoli-funnel": "^1.1.0",
@@ -26,5 +26,10 @@
     "ember-cli": "^2.10.0",
     "jshint": "^2.8.0",
     "qunitjs": "^1.18.0"
+  },
+  "ember-addon": {
+    "paths": [
+      "commands"
+    ]
   }
 }

@@ -1,26 +1,38 @@
-#!/usr/bin/env node
 var http = require('http');
 var fs = require('fs');
 
 var outFile = require('path').resolve(__dirname, '../lib/simple-html-tokenizer/html5-named-char-refs.js');
 
-console.log('downloading html5 entities.json');
-http.get("http://www.w3.org/TR/html5/entities.json", function(res) {
-  console.log(res.statusCode);
-  res.setEncoding('utf8');
-  var body = '';
-  res.on('data', function (chunk) {
-    body += chunk;
-  });
-  res.on('end', function() {
-    var data = JSON.parse(body);
-    console.log(outFile);
-    fs.writeFileSync(outFile, buildEntitiesModule(data));
-  });
-});
-
 // lifted from jshint
 var UNSAFE = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
+
+module.exports = {
+  name: 'build-char-refs',
+  works: 'insideProject',
+  description: 'Rebuild "html5-named-char-refs" from "http://www.w3.org/TR/html5/entities.json"',
+
+  availableOptions: [],
+
+  run: function() {
+    return new Promise(function(resolve) {
+      console.log('downloading html5 entities.json');
+      http.get("http://www.w3.org/TR/html5/entities.json", function(res) {
+        console.log(res.statusCode);
+        res.setEncoding('utf8');
+        var body = '';
+        res.on('data', function (chunk) {
+          body += chunk;
+        });
+        res.on('end', function() {
+          var data = JSON.parse(body);
+          console.log(outFile);
+          fs.writeFileSync(outFile, buildEntitiesModule(data));
+          resolve();
+        });
+      });
+    });
+  }
+};
 
 function codepointLiteral(codepoint) {
   var n = codepoint.toString(16);
