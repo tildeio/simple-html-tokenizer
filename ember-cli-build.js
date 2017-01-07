@@ -1,14 +1,38 @@
 var Funnel = require('broccoli-funnel');
 var Rollup = require('broccoli-rollup');
 var JSHint = require('broccoli-jshint');
+var TypeScript = require('broccoli-typescript-compiler').TypeScript;
 var MergeTrees = require('broccoli-merge-trees');
 var concat = require('broccoli-concat');
 
 module.exports = function(/* defaults */) {
-  var src = new Funnel('src', {
+  var srcJS = new Funnel('src', {
     include: ['**/*.js'],
     destDir: '/src'
   });
+
+  var srcTS = new Funnel('src', {
+    include: ['**/*.ts'],
+    destDir: '/src'
+  });
+
+  var transpiledSrcTs = new TypeScript(srcTS, {
+    tsconfig: {
+      compilerOptions: {
+        module: 'es6',
+        moduleResolution: 'node',
+        target: 'es5',
+        newLine: 'LF',
+        declaration: true,
+        strictNullChecks: true,
+        inlineSourceMap: true,
+        inlineSources: true
+      },
+      include: ['**/*']
+    }
+  });
+
+  var src = new MergeTrees([srcJS, transpiledSrcTs]);
 
   var bundled = new Rollup(src, {
     rollup: {
