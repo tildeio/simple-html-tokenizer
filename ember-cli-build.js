@@ -21,9 +21,9 @@ module.exports = function(/* defaults */) {
     }
   });
 
-  var tests = new Funnel('test', {
+  var tests = new Funnel('tests', {
     files: ['tokenizer-tests.js'],
-    destDir: '/test'
+    destDir: '/tests'
   });
 
   var srcJSHint = new JSHint(src);
@@ -34,7 +34,7 @@ module.exports = function(/* defaults */) {
     inputFiles: ['**/*.js'],
   });
 
-  var testSupport = new Funnel('test', {
+  var testSupport = new Funnel('tests', {
     files: ['index.html'],
     destDir: '/tests'
   });

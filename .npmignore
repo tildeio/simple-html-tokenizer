@@ -1,7 +1,7 @@
 /commands
 /dist/tests
 /node_modules/
-/test/
+/tests/
 /.jshintrc
 /.npmignore
 /.travis.yml
