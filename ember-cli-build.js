@@ -34,6 +34,11 @@ module.exports = function(/* defaults */) {
 
   var src = new MergeTrees([srcJS, transpiledSrcTs]);
 
+  var es6 = new Funnel(src, {
+    srcDir: '/src',
+    destDir: '/es6'
+  });
+
   var bundled = new Rollup(src, {
     rollup: {
       entry: 'src/index.js',
@@ -69,5 +74,5 @@ module.exports = function(/* defaults */) {
     destDir: '/tests'
   });
 
-  return new MergeTrees([bundled, allTests, testSupport, qunit]);
+  return new MergeTrees([bundled, es6, allTests, testSupport, qunit]);
 };
