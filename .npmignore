@@ -1,7 +1,10 @@
+/commands
+/dist/tests
 /node_modules/
-/test/
-/bin/
+/tests/
 /.jshintrc
 /.npmignore
 /.travis.yml
 /testem.json
+/tmp
+/ember-cli-build.js
