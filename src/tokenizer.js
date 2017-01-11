@@ -141,6 +141,10 @@ Tokenizer.prototype = {
   },
 
   finishAttributeValue: function() {
+  },
+
+  reportSyntaxError: function(message) {
+    this.token.syntaxError = message;
   }
 };
 
