@@ -1,6 +1,6 @@
 {
   "name": "simple-html-tokenizer",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "license": "MIT",
   "description": "Simple HTML Tokenizer is a lightweight JavaScript library that can be used to tokenize the kind of HTML normally found in templates.",
   "keywords": [
