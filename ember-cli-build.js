@@ -1,5 +1,6 @@
 var Funnel = require('broccoli-funnel');
 var Rollup = require('broccoli-rollup');
+var babel = require('rollup-plugin-babel');
 var JSHint = require('broccoli-jshint');
 var MergeTrees = require('broccoli-merge-trees');
 var concat = require('broccoli-concat');
@@ -17,7 +18,12 @@ module.exports = function(/* defaults */) {
       sourceMap: true,
       dest: 'simple-html-tokenizer.js',
       format: 'umd',
-      moduleName: 'HTML5Tokenizer'
+      moduleName: 'HTML5Tokenizer',
+      plugins: [
+        babel({
+          exclude: 'node_modules/**'
+        })
+      ]
     }
   });
 
