@@ -7,17 +7,11 @@ var MergeTrees = require('broccoli-merge-trees');
 var concat = require('broccoli-concat');
 
 module.exports = function(/* defaults */) {
-  var srcJS = new Funnel('src', {
-    include: ['**/*.js'],
-    destDir: '/src'
-  });
-
   var srcTS = new Funnel('src', {
-    include: ['**/*.ts'],
     destDir: '/src'
   });
 
-  var transpiledSrcTs = new TypeScript(srcTS, {
+  var src = new TypeScript(srcTS, {
     tsconfig: {
       compilerOptions: {
         module: 'es6',
@@ -32,8 +26,6 @@ module.exports = function(/* defaults */) {
       include: ['**/*']
     }
   });
-
-  var src = new MergeTrees([srcJS, transpiledSrcTs]);
 
   var es6 = new Funnel(src, {
     srcDir: '/src',
@@ -56,11 +48,10 @@ module.exports = function(/* defaults */) {
     destDir: '/tests'
   });
 
-  var srcJSHint = new JSHint(srcJS);
   var testsJSHint = new JSHint(tests);
   var srcTSLint = new TSLint(srcTS);
 
-  var allTests = concat(new MergeTrees([tests, srcJSHint, testsJSHint, srcTSLint]), {
+  var allTests = concat(new MergeTrees([tests, testsJSHint, srcTSLint]), {
     outputFile: '/tests/tests.js',
     inputFiles: ['**/*.js', '**/*.ts'],
   });
