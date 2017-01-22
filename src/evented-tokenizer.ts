@@ -61,7 +61,7 @@ EventedTokenizer.prototype = {
   },
 
   consume: function() {
-    var char = this.peek();
+    let char = this.peek();
 
     this.index++;
 
@@ -76,14 +76,14 @@ EventedTokenizer.prototype = {
   },
 
   consumeCharRef: function() {
-    var endIndex = this.input.indexOf(';', this.index);
+    let endIndex = this.input.indexOf(';', this.index);
     if (endIndex === -1) {
       return;
     }
-    var entity = this.input.slice(this.index, endIndex);
-    var chars = this.entityParser.parse(entity);
+    let entity = this.input.slice(this.index, endIndex);
+    let chars = this.entityParser.parse(entity);
     if (chars) {
-      var count = entity.length;
+      let count = entity.length;
       // consume the entity chars
       while (count) {
         this.consume();
@@ -108,7 +108,7 @@ EventedTokenizer.prototype = {
 
   states: {
     beforeData: function() {
-      var char = this.peek();
+      let char = this.peek();
 
       if (char === "<") {
         this.state = 'tagOpen';
@@ -121,7 +121,7 @@ EventedTokenizer.prototype = {
     },
 
     data: function() {
-      var char = this.peek();
+      let char = this.peek();
 
       if (char === "<") {
         this.delegate.finishData();
@@ -138,7 +138,7 @@ EventedTokenizer.prototype = {
     },
 
     tagOpen: function() {
-      var char = this.consume();
+      let char = this.consume();
 
       if (char === "!") {
         this.state = 'markupDeclaration';
@@ -152,7 +152,7 @@ EventedTokenizer.prototype = {
     },
 
     markupDeclaration: function() {
-      var char = this.consume();
+      let char = this.consume();
 
       if (char === "-" && this.input.charAt(this.index) === "-") {
         this.consume();
@@ -162,7 +162,7 @@ EventedTokenizer.prototype = {
     },
 
     commentStart: function() {
-      var char = this.consume();
+      let char = this.consume();
 
       if (char === "-") {
         this.state = 'commentStartDash';
@@ -176,7 +176,7 @@ EventedTokenizer.prototype = {
     },
 
     commentStartDash: function() {
-      var char = this.consume();
+      let char = this.consume();
 
       if (char === "-") {
         this.state = 'commentEnd';
@@ -190,7 +190,7 @@ EventedTokenizer.prototype = {
     },
 
     comment: function() {
-      var char = this.consume();
+      let char = this.consume();
 
       if (char === "-") {
         this.state = 'commentEndDash';
@@ -200,7 +200,7 @@ EventedTokenizer.prototype = {
     },
 
     commentEndDash: function() {
-      var char = this.consume();
+      let char = this.consume();
 
       if (char === "-") {
         this.state = 'commentEnd';
@@ -211,7 +211,7 @@ EventedTokenizer.prototype = {
     },
 
     commentEnd: function() {
-      var char = this.consume();
+      let char = this.consume();
 
       if (char === ">") {
         this.delegate.finishComment();
@@ -223,7 +223,7 @@ EventedTokenizer.prototype = {
     },
 
     tagName: function() {
-      var char = this.consume();
+      let char = this.consume();
 
       if (isSpace(char)) {
         this.state = 'beforeAttributeName';
@@ -238,7 +238,7 @@ EventedTokenizer.prototype = {
     },
 
     beforeAttributeName: function() {
-      var char = this.peek();
+      let char = this.peek();
 
       if (isSpace(char)) {
         this.consume();
@@ -263,7 +263,7 @@ EventedTokenizer.prototype = {
     },
 
     attributeName: function() {
-      var char = this.peek();
+      let char = this.peek();
 
       if (isSpace(char)) {
         this.state = 'afterAttributeName';
@@ -293,7 +293,7 @@ EventedTokenizer.prototype = {
     },
 
     afterAttributeName: function() {
-      var char = this.peek();
+      let char = this.peek();
 
       if (isSpace(char)) {
         this.consume();
@@ -323,7 +323,7 @@ EventedTokenizer.prototype = {
     },
 
     beforeAttributeValue: function() {
-      var char = this.peek();
+      let char = this.peek();
 
       if (isSpace(char)) {
         this.consume();
@@ -350,7 +350,7 @@ EventedTokenizer.prototype = {
     },
 
     attributeValueDoubleQuoted: function() {
-      var char = this.consume();
+      let char = this.consume();
 
       if (char === '"') {
         this.delegate.finishAttributeValue();
@@ -363,7 +363,7 @@ EventedTokenizer.prototype = {
     },
 
     attributeValueSingleQuoted: function() {
-      var char = this.consume();
+      let char = this.consume();
 
       if (char === "'") {
         this.delegate.finishAttributeValue();
@@ -376,7 +376,7 @@ EventedTokenizer.prototype = {
     },
 
     attributeValueUnquoted: function() {
-      var char = this.peek();
+      let char = this.peek();
 
       if (isSpace(char)) {
         this.delegate.finishAttributeValue();
@@ -397,7 +397,7 @@ EventedTokenizer.prototype = {
     },
 
     afterAttributeValueQuoted: function() {
-      var char = this.peek();
+      let char = this.peek();
 
       if (isSpace(char)) {
         this.consume();
@@ -415,7 +415,7 @@ EventedTokenizer.prototype = {
     },
 
     selfClosingStartTag: function() {
-      var char = this.peek();
+      let char = this.peek();
 
       if (char === ">") {
         this.consume();
@@ -428,7 +428,7 @@ EventedTokenizer.prototype = {
     },
 
     endTagOpen: function() {
-      var char = this.consume();
+      let char = this.consume();
 
       if (isAlpha(char)) {
         this.state = 'tagName';

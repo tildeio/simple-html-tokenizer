@@ -1,13 +1,35 @@
 var Funnel = require('broccoli-funnel');
 var Rollup = require('broccoli-rollup');
 var JSHint = require('broccoli-jshint');
+var TypeScript = require('broccoli-typescript-compiler').TypeScript;
+var TSLint = require('broccoli-tslinter');
 var MergeTrees = require('broccoli-merge-trees');
 var concat = require('broccoli-concat');
 
 module.exports = function(/* defaults */) {
-  var src = new Funnel('src', {
-    include: ['**/*.js'],
+  var srcTS = new Funnel('src', {
     destDir: '/src'
+  });
+
+  var src = new TypeScript(srcTS, {
+    tsconfig: {
+      compilerOptions: {
+        module: 'es6',
+        moduleResolution: 'node',
+        target: 'es5',
+        newLine: 'LF',
+        declaration: true,
+        strictNullChecks: true,
+        inlineSourceMap: true,
+        inlineSources: true
+      },
+      include: ['**/*']
+    }
+  });
+
+  var es6 = new Funnel(src, {
+    srcDir: '/src',
+    destDir: '/es6'
   });
 
   var bundled = new Rollup(src, {
@@ -26,12 +48,12 @@ module.exports = function(/* defaults */) {
     destDir: '/tests'
   });
 
-  var srcJSHint = new JSHint(src);
   var testsJSHint = new JSHint(tests);
+  var srcTSLint = new TSLint(srcTS);
 
-  var allTests = concat(new MergeTrees([tests, srcJSHint, testsJSHint]), {
+  var allTests = concat(new MergeTrees([tests, testsJSHint, srcTSLint]), {
     outputFile: '/tests/tests.js',
-    inputFiles: ['**/*.js'],
+    inputFiles: ['**/*.js', '**/*.ts'],
   });
 
   var testSupport = new Funnel('tests', {
@@ -45,5 +67,5 @@ module.exports = function(/* defaults */) {
     destDir: '/tests'
   });
 
-  return new MergeTrees([bundled, allTests, testSupport, qunit]);
+  return new MergeTrees([bundled, es6, allTests, testSupport, qunit]);
 };

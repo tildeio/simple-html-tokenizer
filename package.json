@@ -12,7 +12,7 @@
     "url": "https://github.com/tildeio/simple-html-tokenizer.git"
   },
   "main": "dist/simple-html-tokenizer.js",
-  "jsnext:main": "src/index.js",
+  "jsnext:main": "dist/es6/index.js",
   "scripts": {
     "build": "ember build",
     "prepublish": "npm run build",
@@ -25,8 +25,12 @@
     "broccoli-jshint": "^2.1.0",
     "broccoli-merge-trees": "^1.2.1",
     "broccoli-rollup": "^1.0.3",
+    "broccoli-tslinter": "^2.0.0",
+    "broccoli-typescript-compiler": "^1.0.1",
     "ember-cli": "^2.10.0",
-    "qunitjs": "^1.18.0"
+    "qunitjs": "^1.18.0",
+    "tslint": "^4.3.1",
+    "typescript": "^2.1.4"
   },
   "ember-addon": {
     "paths": [
