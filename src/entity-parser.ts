@@ -12,7 +12,7 @@ export default class EntityParser {
   parse(entity: string): string | undefined {
     if (!entity) return;
 
-    var matches = entity.match(HEXCHARCODE);
+    let matches = entity.match(HEXCHARCODE);
     if (matches) {
       return String.fromCharCode(parseInt(matches[1], 16));
     }
