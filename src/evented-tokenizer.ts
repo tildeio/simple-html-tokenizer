@@ -1,19 +1,19 @@
-import { Option, opaque, unwrap, preprocessInput, isAlpha, isSpace } from './utils';
-import EntityParser from './entity-parser';
+import { Option, opaque, unwrap, preprocessInput, isAlpha, isSpace } from "./utils";
+import EntityParser from "./entity-parser";
 
 function noop() {}
 
 function wrapDelegate(tokenizer: EventedTokenizer, innerDelegate: DelegateOptions): Delegate {
-  var events = [
-    'reset', 'whitespace',
-    'beginData', 'appendToData', 'finishData',
-    'beginComment', 'appendToCommentData', 'finishComment',
-    'openStartTag', 'openEndTag', 'beginTagName', 'appendToTagName', 'finishTagName', 'finishTag',
-    'beginAttributeName', 'appendToAttributeName', 'finishAttributeName', 'beginWholeAttributeValue', 'beginAttributeValue', 'appendToAttributeValue', 'finishAttributeValue', 'finishWholeAttributeValue', 'voidAttributeValue',
+  let events = [
+    "reset", "whitespace",
+    "beginData", "appendToData", "finishData",
+    "beginComment", "appendToCommentData", "finishComment",
+    "openStartTag", "openEndTag", "beginTagName", "appendToTagName", "finishTagName", "finishTag",
+    "beginAttributeName", "appendToAttributeName", "finishAttributeName", "beginWholeAttributeValue", "beginAttributeValue", "appendToAttributeValue", "finishAttributeValue", "finishWholeAttributeValue", "voidAttributeValue",
   ];
 
   function Delegate() {
-    var self: Delegate = this;
+    let self: Delegate = this;
 
     events.forEach(function(event) {
       if (innerDelegate[event]) {
@@ -91,11 +91,11 @@ export interface Location {
 }
 
 interface Marked {
-  tagStart: Option<Position>,
-  attrEnd: Option<Position>,
-  commentEnd: Option<Position>,
-  slash: Option<Position>,
-  charRef: Option<Position>
+  tagStart: Option<Position>;
+  attrEnd: Option<Position>;
+  commentEnd: Option<Position>;
+  slash: Option<Position>;
+  charRef: Option<Position>;
 }
 
 export default class EventedTokenizer {
@@ -118,7 +118,7 @@ export default class EventedTokenizer {
     charRef: null
   };
 
-  constructor(delegate: DelegateOptions, public entityParser: EntityParser, public input: string = '') {
+  constructor(delegate: DelegateOptions, public entityParser: EntityParser, public input: string = "") {
     this.delegate = wrapDelegate(this, delegate);
     this.entityParser = entityParser;
     this.state = BeforeData;
@@ -159,7 +159,7 @@ export default class EventedTokenizer {
   }
 
   consume() {
-    var char = this.peek();
+    let char = this.peek();
 
     this.index++;
 
@@ -177,16 +177,16 @@ export default class EventedTokenizer {
     this.markCharRef();
     this.consume();
 
-    var endIndex = this.input.indexOf(';', this.index);
+    let endIndex = this.input.indexOf(";", this.index);
     if (endIndex === -1) {
-      return { loc: unwrap(this.marked.charRef), char: '&' };
+      return { loc: unwrap(this.marked.charRef), char: "&" };
     }
 
-    var entity = this.input.slice(this.index, endIndex);
+    let entity = this.input.slice(this.index, endIndex);
 
-    var chars = this.entityParser.parse(entity);
+    let chars = this.entityParser.parse(entity);
     if (chars) {
-      var count = entity.length;
+      let count = entity.length;
       // consume the entity chars
       while (count) {
         this.consume();
@@ -197,11 +197,11 @@ export default class EventedTokenizer {
 
       return {
         loc: unwrap(this.marked.charRef),
-        char: { chars: chars, source: '&' + entity + ';' }
-      }
+        char: { chars: chars, source: "&" + entity + ";" }
+      };
     }
 
-    return { loc: unwrap(this.marked.charRef), char: '&' };
+    return { loc: unwrap(this.marked.charRef), char: "&" };
   }
 
   markTagStart() {
@@ -229,7 +229,7 @@ export default class EventedTokenizer {
   }
 
   flushWhitespace() {
-    var delegate = this.delegate;
+    let delegate = this.delegate;
 
     this.bufferedWhitespace.forEach(function(ws) {
       delegate.whitespace(ws[0], ws[1]);
@@ -239,7 +239,7 @@ export default class EventedTokenizer {
   }
 
   flushCommentData() {
-    var delegate = this.delegate;
+    let delegate = this.delegate;
 
     this.bufferedWhitespace.forEach(function(ws) {
       delegate.appendToCommentData(ws[0], ws[1]);
@@ -264,7 +264,7 @@ interface State {
 
 const BeforeData: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (char === "<") {
       t.state = TagOpen;
@@ -275,11 +275,11 @@ const BeforeData: State = {
       t.delegate.beginData(t);
     }
   }
-}
+};
 
 const Data: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (char === "<") {
       t.delegate.finishData(t);
@@ -287,18 +287,18 @@ const Data: State = {
       t.markTagStart();
       t.consume(); 
     } else if (char === "&") {
-      var ref = t.consumeCharRef('');
+      let ref = t.consumeCharRef("");
       t.delegate.appendToData(ref.loc, ref.char);
     } else {
       t.delegate.appendToData(t, char);
       t.consume();
     }
   }
-}
+};
 
 const TagOpen: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (char === "!") {
       t.state = MarkupDeclaration;
@@ -318,7 +318,7 @@ const TagOpen: State = {
 
 const MarkupDeclaration: State = {
   process(t: EventedTokenizer) {
-    var char = t.consume();
+    let char = t.consume();
 
     if (char === "-" && t.input.charAt(t.index) === "-") {
       t.state = CommentStart;
@@ -330,7 +330,7 @@ const MarkupDeclaration: State = {
 
 const CommentStart: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (char === "-") {
       t.bufferWhitespace(char);
@@ -350,7 +350,7 @@ const CommentStart: State = {
 
 const CommentStartDash: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (char === "-") {
       t.bufferWhitespace(char);
@@ -372,7 +372,7 @@ const CommentStartDash: State = {
 
 const Comment: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (char === "-") {
       t.bufferWhitespace(char);
@@ -387,7 +387,7 @@ const Comment: State = {
 
 const CommentEndDash: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (char === "-") {
       t.bufferWhitespace(char);
@@ -404,7 +404,7 @@ const CommentEndDash: State = {
 
 const CommentEnd: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (char === ">") {
       t.flushWhitespace();
@@ -422,7 +422,7 @@ const CommentEnd: State = {
 
 const TagName: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (isSpace(char)) {
       t.delegate.finishTagName(t);
@@ -447,7 +447,7 @@ const TagName: State = {
 
 const BeforeAttributeName: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (isSpace(char)) {
       t.delegate.whitespace(t, char);
@@ -471,7 +471,7 @@ const BeforeAttributeName: State = {
 
 const AttributeName: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (isSpace(char)) {
       t.markAttributeEnd();
@@ -499,11 +499,11 @@ const AttributeName: State = {
       t.consume();
     }
   }
-}
+};
 
 const AfterAttributeName: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (isSpace(char)) {
       t.markAttributeEnd();
@@ -535,12 +535,12 @@ const AfterAttributeName: State = {
 
 const BeforeAttributeValue: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (isSpace(char)) {
       t.delegate.whitespace(t, char);
       t.consume();
-    } else if (char === '"') {
+    } else if (char === `"`) {
       t.state = AttributeValueDoubleQuoted;
       t.delegate.beginWholeAttributeValue(t);
       t.delegate.whitespace(t, char);
@@ -569,16 +569,16 @@ const BeforeAttributeValue: State = {
 
 const AttributeValueDoubleQuoted: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
-    if (char === '"') {
+    if (char === `"`) {
       t.delegate.finishAttributeValue(t, true);
       t.delegate.whitespace(t, char);
       t.consume();
       t.delegate.finishWholeAttributeValue(t);
       t.state = AfterAttributeValueQuoted;
     } else if (char === "&") {
-      var ref = t.consumeCharRef('');
+      let ref = t.consumeCharRef("");
       t.delegate.appendToAttributeValue(ref.loc, ref.char);
     } else {
       t.delegate.appendToAttributeValue(t, char);
@@ -589,7 +589,7 @@ const AttributeValueDoubleQuoted: State = {
 
 const AttributeValueSingleQuoted: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (char === "'") {
       t.delegate.finishAttributeValue(t, true);
@@ -598,18 +598,18 @@ const AttributeValueSingleQuoted: State = {
       t.delegate.finishWholeAttributeValue(t);
       t.state = AfterAttributeValueQuoted;
     } else if (char === "&") {
-      var ref = t.consumeCharRef("'");
+      let ref = t.consumeCharRef("'");
       t.delegate.appendToAttributeValue(ref.loc, ref.char);
     } else {
       t.delegate.appendToAttributeValue(t, char);
       t.consume();
     }
   }
-}
+};
 
 const AttributeValueUnquoted: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (isSpace(char)) {
       t.delegate.finishAttributeValue(t, false);
@@ -618,7 +618,7 @@ const AttributeValueUnquoted: State = {
       t.consume();
       t.state = BeforeAttributeName;
     } else if (char === "&") {
-      var ref = t.consumeCharRef('>');
+      let ref = t.consumeCharRef(">");
       t.delegate.appendToAttributeValue(ref.loc, ref.char);
       t.consume();
     } else if (char === ">") {
@@ -636,7 +636,7 @@ const AttributeValueUnquoted: State = {
 
 const AfterAttributeValueQuoted: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (isSpace(char)) {
       t.delegate.whitespace(t, char);
@@ -653,18 +653,18 @@ const AfterAttributeValueQuoted: State = {
       t.state = BeforeAttributeName;
     }
   }
-}
+};
 
 const SelfClosingStartTag: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (char === ">") {
       t.consume();
       t.delegate.finishTag(t, true);
       t.state = BeforeData;
     } else {
-      t.delegate.whitespace(t.lastPos(), '/');
+      t.delegate.whitespace(t.lastPos(), "/");
       t.state = BeforeAttributeName;
     }
   }
@@ -672,7 +672,7 @@ const SelfClosingStartTag: State = {
 
 const EndTagOpen: State = {
   process(t: EventedTokenizer) {
-    var char = t.peek();
+    let char = t.peek();
 
     if (isAlpha(char)) {
       t.state = TagName;

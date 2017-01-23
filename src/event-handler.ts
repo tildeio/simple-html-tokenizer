@@ -77,7 +77,7 @@
 // abstract class PositionedDelegate extends Delegate {
 //   constructor(public loc: LocationBuilder, handler: EventHandler) {
 //     super(handler);
-//   }  
+//   }
 // }
 
 // export abstract class CharBuilder extends PositionedDelegate {
@@ -86,7 +86,7 @@
 //   pushChar(char: string): this {
 //     this.chars += char;
 //     return this;
-//   }  
+//   }
 // }
 
 // export class Position {
@@ -144,7 +144,7 @@
 //   }
 // }
 
-// class BaseBuilder extends Delegate { 
+// class BaseBuilder extends Delegate {
 //   protected state = "base";
 
 //   openTag(pos: Position, kind: 'start' | 'end'): Delegate {
@@ -156,7 +156,7 @@
 //       return new StartTagBuilder(new LocationBuilder(pos), this.handler);
 //     } else {
 //       return new EndTagBuilder(new LocationBuilder(pos), this.handler);
-//     } 
+//     }
 //   }
 
 //   beginData(pos: Position): DataBuilder {
@@ -237,7 +237,7 @@
 // }
 
 // class AttributeValueBuilder extends CharBuilder {
-  
+
 // }
 
 // class StartTagBuilder extends TagBuilder {
@@ -263,19 +263,19 @@
 // export class StartTag extends Token {
 //   constructor(loc: Location, public name: TagName) {
 //     super(loc);
-//   }  
+//   }
 // }
 
 // export class EndTag extends Token {
 //   constructor(loc: Location, public name: TagName) {
 //     super(loc);
-//   }  
+//   }
 // }
 
 // export class TagName extends Token {
 //   constructor(loc: Location, public chars: string) {
 //     super(loc);
-//   }  
+//   }
 // }
 
 // export class AttributeName extends Token {
@@ -291,7 +291,7 @@
 //   delegate: Delegate;
 
 //   constructor(delegate) {
-//     this.delegate = delegate;    
+//     this.delegate = delegate;
 //   }
 
 //   advance(char) {

@@ -3,15 +3,15 @@ import EventedTokenizer, {
   DelegateOptions,
   Position,
   Char
-} from './evented-tokenizer';
-import EntityParser from './entity-parser';
-import { Option, unwrap, or } from './utils';
+} from "./evented-tokenizer";
+import EntityParser from "./entity-parser";
+import { Option, unwrap, or } from "./utils";
 
 type TokenType =
-    'Chars'
-  | 'Comment'
-  | 'StartTag'
-  | 'EndTag'
+    "Chars"
+  | "Comment"
+  | "StartTag"
+  | "EndTag"
   ;
 
 export interface Token {
@@ -20,25 +20,25 @@ export interface Token {
 }
 
 export interface CharsToken extends Token {
-  type: 'Chars' | 'Comment';
+  type: "Chars" | "Comment";
   chars: string;
 }
 
 export interface TagToken extends Token {
-  type: 'StartTag' | 'EndTag';
+  type: "StartTag" | "EndTag";
   tagName: string;
 }
 
 export type Attribute = [string, string, boolean];
 
 export interface StartTagToken extends TagToken {
-  type: 'StartTag';
+  type: "StartTag";
   attributes: Attribute[];
   selfClosing: boolean;
 }
 
 export interface EndTagToken extends TagToken {
-  type: 'EndTag';
+  type: "EndTag";
 }
 
 function unwrapAsToken<T extends Token>(token: Option<Token>, type: TokenType | TokenType[]): T {
@@ -131,16 +131,16 @@ export default class Tokenizer implements DelegateOptions {
   beginData() {
     this.token = {
       loc: null,
-      type: 'Chars',
-      chars: ''
+      type: "Chars",
+      chars: ""
     } as CharsToken;
     this.tokens.push(this.token);
   }
 
   appendToData(pos: Position, char: Char) {
-    let chars = typeof char === 'string' ? char : char.chars;
+    let chars = typeof char === "string" ? char : char.chars;
 
-    unwrapAsToken<CharsToken>(this.token, 'Chars').chars += chars;
+    unwrapAsToken<CharsToken>(this.token, "Chars").chars += chars;
   }
 
   finishData() {
@@ -152,14 +152,14 @@ export default class Tokenizer implements DelegateOptions {
   beginComment() {
     this.token = {
       loc: null,
-      type: 'Comment',
-      chars: ''
+      type: "Comment",
+      chars: ""
     } as CharsToken;
     this.tokens.push(this.token);
   }
 
   appendToCommentData(pos: Position, char: string) {
-    unwrapAsToken<CharsToken>(this.token, 'Comment').chars += char;
+    unwrapAsToken<CharsToken>(this.token, "Comment").chars += char;
   }
 
   finishComment() {
@@ -171,8 +171,8 @@ export default class Tokenizer implements DelegateOptions {
   openStartTag(pos: Position) {
     let token = this.token = {
       loc: null,
-      type: 'StartTag',
-      tagName: '',
+      type: "StartTag",
+      tagName: "",
       attributes: [],
       selfClosing: false
     } as StartTagToken;
@@ -183,15 +183,15 @@ export default class Tokenizer implements DelegateOptions {
   openEndTag(pos: Position) {
     let token = this.token = {
       loc: null,
-      type: 'EndTag',
-      tagName: ''
+      type: "EndTag",
+      tagName: ""
     } as EndTagToken;
 
     this.tokens.push(token);
   }
 
   finishTag(pos: Position, selfClosing: boolean) {
-    if (isToken<StartTagToken>(this.token, 'StartTag')) {
+    if (isToken<StartTagToken>(this.token, "StartTag")) {
       this.token.selfClosing = selfClosing;
     }
     this.addLocInfo();
@@ -200,14 +200,14 @@ export default class Tokenizer implements DelegateOptions {
   // Tags - name
 
   appendToTagName(pos: Position, char: string) {
-    unwrapAsToken<TagToken>(this.token, ['StartTag', 'EndTag']).tagName += char;
+    unwrapAsToken<TagToken>(this.token, ["StartTag", "EndTag"]).tagName += char;
   }
 
   // Tags - attributes
 
   beginAttributeName() {
     this.currentAttribute = ["", "", false];
-    unwrapAsToken<StartTagToken>(this.token, 'StartTag').attributes.push(this.currentAttribute);
+    unwrapAsToken<StartTagToken>(this.token, "StartTag").attributes.push(this.currentAttribute);
   }
 
   appendToAttributeName(pos: Position, char: string) {
@@ -221,7 +221,7 @@ export default class Tokenizer implements DelegateOptions {
   appendToAttributeValue(pos: Position, char: Char) {
     let attr = unwrap(this.currentAttribute);
     attr[1] = attr[1] || "";
-    if (typeof char === 'string') {
+    if (typeof char === "string") {
       attr[1] += char;
     } else {
       attr[1] += char.chars;

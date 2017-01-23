@@ -1,8 +1,8 @@
-export * from './index.ts';
+export * from "./index.ts";
 
 export {
   Delegate,
   DelegateOptions,
   Position,
   Char
-} from './evented-tokenizer';
+} from "./evented-tokenizer";
