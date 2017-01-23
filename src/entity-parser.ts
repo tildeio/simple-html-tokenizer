@@ -3,7 +3,8 @@ const CHARCODE    = /^#([0-9]+)$/;
 const NAMED       = /^([A-Za-z0-9]+)$/;
 
 export default class EntityParser {
-  constructor(private named) {}
+  constructor(private named) {
+  }
 
   parse(entity) {
     if (!entity) {
