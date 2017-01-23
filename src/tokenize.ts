@@ -1,4 +1,4 @@
-import { default as Tokenizer, Token } from './tokenizer';
+import Tokenizer, { Token } from './tokenizer';
 import EntityParser from './entity-parser';
 import namedCharRefs from './html5-named-char-refs';
 

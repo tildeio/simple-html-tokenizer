@@ -1,29 +1,16 @@
 import { preprocessInput, isAlpha, isSpace } from './utils';
 
 export default class EventedTokenizer {
-  private delegate: any;
-  private entityParser: any;
-  private state: any;
-  private input: any;
-  private index: number;
-  private tagLine: number;
-  private tagColumn: number;
+  private state: any = null;
+  private input: any = null;
+  private index: number = -1;
+  private tagLine: number = -1;
+  private tagColumn: number = -1;
 
-  public line: number;
-  public column: number;
+  public line: number = -1;
+  public column: number = -1;
 
-  constructor(delegate, entityParser) {
-    this.delegate = delegate;
-    this.entityParser = entityParser;
-
-    this.state = null;
-    this.input = null;
-
-    this.index = -1;
-    this.line = -1;
-    this.column = -1;
-    this.tagLine = -1;
-    this.tagColumn = -1;
+  constructor(private delegate, private entityParser) {
   }
 
   reset() {

@@ -22,22 +22,18 @@ export interface Token {
       column: number;
     }
   };
+  syntaxError?: string;
 }
 
 export default class Tokenizer {
-  private token: Token;
-  private startLine: number;
-  private startColumn: number;
-  private options: TokenizerOptions;
+  private token: Token = null;
+  private startLine: number = 1;
+  private startColumn: number = 0;
   private tokenizer: EventedTokenizer;
   private tokens: Token[] = [];
   private currentAttribute: Attribute = null;
 
-  constructor(entityParser, options: TokenizerOptions = {}) {
-    this.token = null;
-    this.startLine = 1;
-    this.startColumn = 0;
-    this.options = options;
+  constructor(entityParser, private options: TokenizerOptions = {}) {
     this.tokenizer = new EventedTokenizer(this, entityParser);
   }
 
@@ -175,7 +171,7 @@ export default class Tokenizer {
   finishAttributeValue() {
   }
 
-  reportSyntaxError(message) {
+  reportSyntaxError(message: string) {
     this.token.syntaxError = message;
   }
 }

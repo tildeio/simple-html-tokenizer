@@ -1,4 +1,4 @@
-/*globals HTML5Tokenizer */
+/* globals HTML5Tokenizer */
 
 QUnit.module("simple-html-tokenizer - tokenizer");
 
