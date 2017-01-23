@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "target": "es2015",
+        "module": "es2015",
+        "isolatedModules": false,
+        "inlineSourceMap": true,
+        "inlineSources": true,
+        "strictNullChecks": true,
+        "moduleResolution": "node",
+        "noImplicitAny": true,
+        "rootDir": "./",
+        "baseUrl" : "./",
+        "paths": {
+            "simple-html-tokenizer": [
+                "src/index.ts"
+            ]
+        }
+    },
+    "exclude": [
+        "tmp",
+        "node_modules",
+        "dist"
+    ]
+}
