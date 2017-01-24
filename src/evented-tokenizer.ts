@@ -11,6 +11,7 @@ export default class EventedTokenizer {
   public column: number = -1;
 
   constructor(private delegate, private entityParser) {
+    this.reset();
   }
 
   reset() {
