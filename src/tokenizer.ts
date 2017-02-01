@@ -27,8 +27,8 @@ export interface Token {
 
 export default class Tokenizer {
   private token: Token = null;
-  private startLine: number = 1;
-  private startColumn: number = 0;
+  private startLine = 1;
+  private startColumn = 0;
   private tokenizer: EventedTokenizer;
   private tokens: Token[] = [];
   private currentAttribute: Attribute = null;
