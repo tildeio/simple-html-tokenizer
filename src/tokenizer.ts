@@ -17,6 +17,7 @@ type TokenType =
 export interface Token {
   type: TokenType;
   loc: Option<Location>;
+  syntaxError?: string
 }
 
 export interface CharsToken extends Token {
@@ -226,5 +227,9 @@ export default class Tokenizer implements DelegateOptions {
     } else {
       attr[1] += char.chars;
     }
+  }
+
+  reportSyntaxError(message: string) {
+    unwrap(this.token).syntaxError = message;
   }
 }
