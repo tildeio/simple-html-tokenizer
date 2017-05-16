@@ -124,7 +124,7 @@ export default class EventedTokenizer {
         this.delegate.finishData();
         this.state = 'tagOpen';
         this.markTagStart();
-        this.consume(); 
+        this.consume();
       } else if (char === "&") {
         this.consume();
         this.delegate.appendToData(this.consumeCharRef() || "&");
