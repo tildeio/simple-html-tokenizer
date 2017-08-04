@@ -12,6 +12,7 @@
     "url": "https://github.com/tildeio/simple-html-tokenizer.git"
   },
   "main": "dist/simple-html-tokenizer.js",
+  "module": "dist/es6/index.js",
   "jsnext:main": "dist/es6/index.js",
   "typings": "dist/es6/index.d.ts",
   "scripts": {
