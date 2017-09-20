@@ -151,7 +151,7 @@ export default class Tokenizer {
   // Tags - attributes
 
   beginAttribute() {
-    this.currentAttribute = ["", "", null];
+    this.currentAttribute = ["", "", false];
     this.token.attributes.push(this.currentAttribute);
   }
 
