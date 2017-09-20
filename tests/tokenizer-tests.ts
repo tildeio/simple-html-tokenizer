@@ -1,44 +1,45 @@
-/* globals HTML5Tokenizer */
+import { tokenize } from 'simple-html-tokenizer';
 
+/* global HTML5Tokenizer: false */
 QUnit.module("simple-html-tokenizer - tokenizer");
 
 QUnit.test("Simple content", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("hello");
+  var tokens = tokenize("hello");
   assert.deepEqual(tokens, [
     chars("hello")
   ]);
 });
 
 QUnit.test("A simple tag", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("<div>");
+  var tokens = tokenize("<div>");
   assert.deepEqual(tokens, [
     startTag("div")
   ]);
 });
 
 QUnit.test("A simple tag with trailing spaces", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("<div   \t\n>");
+  var tokens = tokenize("<div   \t\n>");
   assert.deepEqual(tokens, [
     startTag("div")
   ]);
 });
 
 QUnit.test("A simple closing tag", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("</div>");
+  var tokens = tokenize("</div>");
   assert.deepEqual(tokens, [
     endTag("div")
   ]);
 });
 
 QUnit.test("A simple closing tag with trailing spaces", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("</div   \t\n>");
+  var tokens = tokenize("</div   \t\n>");
     assert.deepEqual(tokens, [
     endTag("div")
   ]);
 });
 
 QUnit.test("A pair of hyphenated tags", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("<x-foo></x-foo>");
+  var tokens = tokenize("<x-foo></x-foo>");
   assert.deepEqual(tokens, [
     startTag("x-foo"),
     endTag("x-foo")
@@ -46,35 +47,35 @@ QUnit.test("A pair of hyphenated tags", function(assert) {
 });
 
 QUnit.test("A tag with a single-quoted attribute", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("<div id='foo'>");
+  var tokens = tokenize("<div id='foo'>");
   assert.deepEqual(tokens, [
     startTag("div", [["id", "foo", true]])
   ]);
 });
 
 QUnit.test("A tag with a double-quoted attribute", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize('<div id="foo">');
+  var tokens = tokenize('<div id="foo">');
   assert.deepEqual(tokens, [
     startTag("div", [["id", "foo", true]])
   ]);
 });
 
 QUnit.test("A tag with a double-quoted empty", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize('<div id="">');
+  var tokens = tokenize('<div id="">');
   assert.deepEqual(tokens, [
     startTag("div", [["id", "", true]])
   ]);
 });
 
 QUnit.test("A tag with unquoted attribute", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize('<div id=foo>');
+  var tokens = tokenize('<div id=foo>');
   assert.deepEqual(tokens, [
     startTag("div", [["id", "foo", false]])
   ]);
 });
 
 QUnit.test("A tag with valueless attributes", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize('<div foo bar>');
+  var tokens = tokenize('<div foo bar>');
   assert.deepEqual(tokens, [
     startTag("div", [
       ["foo", "", false],
@@ -102,8 +103,9 @@ QUnit.test("Invalid character in attribute name", function(assert) {
   ]);
 });
 
+
 QUnit.test("A tag with multiple attributes", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize('<div id=foo class="bar baz" href=\'bat\'>');
+  var tokens = tokenize('<div id=foo class="bar baz" href=\'bat\'>');
   assert.deepEqual(tokens, [
     startTag("div", [
       ["id", "foo", false],
@@ -114,28 +116,28 @@ QUnit.test("A tag with multiple attributes", function(assert) {
 });
 
 QUnit.test("A tag with capitalization in attributes", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize('<svg viewBox="0 0 0 0">');
+  var tokens = tokenize('<svg viewBox="0 0 0 0">');
   assert.deepEqual(tokens, [
     startTag("svg", [["viewBox", "0 0 0 0", true]])
   ]);
 });
 
 QUnit.test("A tag with capitalization in the tag", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize('<linearGradient>');
+  var tokens = tokenize('<linearGradient>');
   assert.deepEqual(tokens, [
     startTag("linearGradient", [])
   ]);
 });
 
 QUnit.test("A self-closing tag", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize('<img />');
+  var tokens = tokenize('<img />');
   assert.deepEqual(tokens, [
     startTag("img", [], true)
   ]);
 });
 
 QUnit.test("A self-closing tag with valueless attributes (regression)", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize('<input disabled />');
+  var tokens = tokenize('<input disabled />');
   assert.deepEqual(tokens, [
     startTag("input", [
       ["disabled", "", false]
@@ -144,7 +146,7 @@ QUnit.test("A self-closing tag with valueless attributes (regression)", function
 });
 
 QUnit.test("A self-closing tag with valueless attributes without space before closing (regression)", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize('<input disabled/>');
+  var tokens = tokenize('<input disabled/>');
   assert.deepEqual(tokens, [
     startTag("input", [
       ["disabled", "", false]
@@ -153,14 +155,14 @@ QUnit.test("A self-closing tag with valueless attributes without space before cl
 });
 
 QUnit.test("A tag with a / in the middle", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize('<img / src="foo.png">');
+  var tokens = tokenize('<img / src="foo.png">');
   assert.deepEqual(tokens, [
     startTag("img", [["src", "foo.png", true]])
   ]);
 });
 
 QUnit.test("An opening and closing tag with some content", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("<div id='foo' class='{{bar}} baz'>Some content</div>");
+  var tokens = tokenize("<div id='foo' class='{{bar}} baz'>Some content</div>");
   assert.deepEqual(tokens, [
     startTag("div", [["id", "foo", true], ["class", "{{bar}} baz", true]]),
     chars("Some content"),
@@ -169,47 +171,47 @@ QUnit.test("An opening and closing tag with some content", function(assert) {
 });
 
 QUnit.test("A comment", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("<!-- hello -->");
+  var tokens = tokenize("<!-- hello -->");
   assert.deepEqual(tokens, [
     comment(" hello ")
   ]);
 });
 
 QUnit.test("A (buggy) comment with no ending --", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("<!-->");
+  var tokens = tokenize("<!-->");
   assert.deepEqual(tokens, [
-    comment()
+    comment('')
   ]);
 });
 
 QUnit.test("A comment that immediately closes", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("<!---->");
+  var tokens = tokenize("<!---->");
   assert.deepEqual(tokens, [
     comment()
   ]);
 });
 
 QUnit.test("A comment that contains a -", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("<!-- A perfectly legal - appears -->");
+  var tokens = tokenize("<!-- A perfectly legal - appears -->");
   assert.deepEqual(tokens, [
     comment(" A perfectly legal - appears ")
   ]);
 });
 
 QUnit.test("A (buggy) comment that contains two --", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("<!-- A questionable -- appears -->");
+  var tokens = tokenize("<!-- A questionable -- appears -->");
   assert.deepEqual(tokens, [
     comment(" A questionable -- appears ")
   ]);
 });
 
 QUnit.test("Character references are expanded", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("&quot;Foo &amp; Bar&quot; &lt; &#60;&#x3c; &#x3C; &LT; &NotGreaterFullEqual; &Borksnorlax; &nleqq;");
+  var tokens = tokenize("&quot;Foo &amp; Bar&quot; &lt; &#60;&#x3c; &#x3C; &LT; &NotGreaterFullEqual; &Borksnorlax; &nleqq;");
   assert.deepEqual(tokens, [
     chars('"Foo & Bar" < << < < ≧̸ &Borksnorlax; ≦̸')
   ]);
 
-  tokens = HTML5Tokenizer.tokenize("<div title='&quot;Foo &amp; Bar&quot; &blk12; &lt; &#60;&#x3c; &#x3C; &LT; &NotGreaterFullEqual; &Borksnorlax; &nleqq;'>");
+  tokens = tokenize("<div title='&quot;Foo &amp; Bar&quot; &blk12; &lt; &#60;&#x3c; &#x3C; &LT; &NotGreaterFullEqual; &Borksnorlax; &nleqq;'>");
   assert.deepEqual(tokens, [
     startTag("div", [
       ["title", '"Foo & Bar" ▒ < << < < ≧̸ &Borksnorlax; ≦̸', true]
@@ -220,7 +222,7 @@ QUnit.test("Character references are expanded", function(assert) {
 QUnit.module("simple-html-tokenizer - preprocessing");
 
 QUnit.test("Carriage returns are replaced with line feeds", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("\r\r\n\r\r\n\n");
+  var tokens = tokenize("\r\r\n\r\r\n\n");
   assert.deepEqual(tokens, [
     chars("\n\n\n\n\n")
   ]);
@@ -229,21 +231,21 @@ QUnit.test("Carriage returns are replaced with line feeds", function(assert) {
 QUnit.module("simple-html-tokenizer - location info");
 
 QUnit.test("lines are counted correctly", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("\r\r\n\r\r\n\n", { loc: true });
+  var tokens = tokenize("\r\r\n\r\r\n\n", { loc: true });
   assert.deepEqual(tokens, [
     locInfo(chars("\n\n\n\n\n"), 1, 0, 6, 0)
   ]);
 });
 
 QUnit.test("tokens: Chars", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("Chars", { loc: true });
+  var tokens = tokenize("Chars", { loc: true });
   assert.deepEqual(tokens, [
     locInfo(chars("Chars"), 1, 0, 1, 5)
   ]);
 });
 
 QUnit.test("tokens: Chars start-tag Chars", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("Chars<div>Chars", { loc: true });
+  var tokens = tokenize("Chars<div>Chars", { loc: true });
   assert.deepEqual(tokens, [
     locInfo(chars("Chars"), 1, 0, 1, 5),
     locInfo(startTag('div'), 1, 5, 1, 10),
@@ -252,7 +254,7 @@ QUnit.test("tokens: Chars start-tag Chars", function(assert) {
 });
 
 QUnit.test("tokens: start-tag start-tag", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("<div><div>", { loc: true });
+  var tokens = tokenize("<div><div>", { loc: true });
   assert.deepEqual(tokens, [
     locInfo(startTag('div'), 1, 0, 1, 5),
     locInfo(startTag('div'), 1, 5, 1, 10)
@@ -260,7 +262,7 @@ QUnit.test("tokens: start-tag start-tag", function(assert) {
 });
 
 QUnit.test("tokens: html char ref start-tag", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("&gt;<div>", { loc: true });
+  var tokens = tokenize("&gt;<div>", { loc: true });
   assert.deepEqual(tokens, [
     locInfo(chars('>'), 1, 0, 1, 4),
     locInfo(startTag('div'), 1, 4, 1, 9)
@@ -268,7 +270,7 @@ QUnit.test("tokens: html char ref start-tag", function(assert) {
 });
 
 QUnit.test("tokens: Chars start-tag Chars start-tag", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("Chars\n<div>Chars\n<div>", { loc: true });
+  var tokens = tokenize("Chars\n<div>Chars\n<div>", { loc: true });
   assert.deepEqual(tokens, [
     locInfo(chars("Chars\n"), 1, 0, 2, 0),
     locInfo(startTag('div'), 2, 0, 2, 5),
@@ -278,7 +280,7 @@ QUnit.test("tokens: Chars start-tag Chars start-tag", function(assert) {
 });
 
 QUnit.test("tokens: comment start-tag Chars end-tag", function(assert) {
-  var tokens = HTML5Tokenizer.tokenize("<!-- multline\ncomment --><div foo=bar>Chars\n</div>", { loc: true });
+  var tokens = tokenize("<!-- multline\ncomment --><div foo=bar>Chars\n</div>", { loc: true });
   assert.deepEqual(tokens, [
     locInfo(comment(" multline\ncomment "), 1, 0, 2, 11),
     locInfo(startTag('div', [['foo', "bar", false]]), 2, 11, 2, 24),
@@ -287,37 +289,59 @@ QUnit.test("tokens: comment start-tag Chars end-tag", function(assert) {
   ]);
 });
 
-function chars(s) {
+function chars(chars: string = '') {
   return {
     type: "Chars",
-    chars: s || ""
+    loc: null as Location,
+    chars
   };
 }
 
-function comment(s) {
+function comment(chars: string = '') {
   return {
     type: "Comment",
-    chars: s || ""
+    loc: null as Location,
+    chars
   };
 }
 
-function startTag(tagName, attributes, selfClosing) {
+type Option<T> = T | null;
+
+interface Position {
+  line: number;
+  column: number;
+}
+
+interface Location {
+  start: Position;
+  end: Position;
+}
+
+interface Token {
+  loc: Option<Location>;
+}
+
+type Attribute = [string, string, boolean];
+
+function startTag(tagName: string, attributes: Attribute[] = [], selfClosing: boolean = false) {
   return {
     type: "StartTag",
-    tagName: tagName,
-    attributes: attributes === undefined ? [] : attributes,
-    selfClosing: selfClosing === undefined ? false : selfClosing,
+    loc: null as Location,
+    tagName,
+    attributes,
+    selfClosing
   };
 }
 
-function endTag(tagName) {
+function endTag(tagName: string) {
   return {
     type: "EndTag",
+    loc: null as Location,
     tagName: tagName
   };
 }
 
-function locInfo(token, startLine, startColumn, endLine, endColumn) {
+function locInfo(token: Token, startLine: number, startColumn: number, endLine: number, endColumn: number) {
   token.loc = {
     start: {
       line: startLine,
@@ -332,7 +356,7 @@ function locInfo(token, startLine, startColumn, endLine, endColumn) {
   return token;
 }
 
-function withSyntaxError(message, result) {
+function withSyntaxError(message: string, result: { syntaxError?: string }) {
   result.syntaxError = message;
   return result;
 }
