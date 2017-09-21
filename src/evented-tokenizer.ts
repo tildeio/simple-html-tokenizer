@@ -1,5 +1,8 @@
 import { preprocessInput, isAlpha, isSpace } from './utils';
 
+export type States = 'beforeData' | 'data' | 'tagOpen' | 'endTagOpen' | 'markupDeclaration' | 'commentStart' | 'comment' | 'commentStartDash' | 'commentEnd' | 'commentEndDash' | 'beforeAttributeName' | 'attributeName' | 'afterAttributeName' | 'selfClosingStartTag' | 'attributeValueDoubleQuoted' | 'attributeValueSingleQuoted' |
+'attributeValueUnquoted' | 'attributeValueQuoted';
+
 export default class EventedTokenizer {
   private state: any = null;
   private input: any = null;
@@ -15,7 +18,7 @@ export default class EventedTokenizer {
   }
 
   reset() {
-    this.state = 'beforeData';
+    this.transitionTo('beforeData');
     this.input = '';
 
     this.index = 0;
@@ -26,6 +29,10 @@ export default class EventedTokenizer {
     this.tagColumn = -1;
 
     this.delegate.reset();
+  }
+
+  transitionTo(state: States) {
+    this.state = state;
   }
 
   tokenize(input) {
@@ -49,7 +56,7 @@ export default class EventedTokenizer {
   flushData() {
     if (this.state === 'data') {
       this.delegate.finishData();
-      this.state = 'beforeData';
+      this.transitionTo('beforeData');
     }
   }
 
@@ -108,11 +115,11 @@ export default class EventedTokenizer {
       let char = this.peek();
 
       if (char === "<") {
-        this.state = 'tagOpen';
+        this.transitionTo('tagOpen');
         this.markTagStart();
         this.consume();
       } else {
-        this.state = 'data';
+        this.transitionTo('data');
         this.delegate.beginData();
       }
     },
@@ -122,7 +129,7 @@ export default class EventedTokenizer {
 
       if (char === "<") {
         this.delegate.finishData();
-        this.state = 'tagOpen';
+        this.transitionTo('tagOpen');
         this.markTagStart();
         this.consume();
       } else if (char === "&") {
@@ -138,11 +145,11 @@ export default class EventedTokenizer {
       let char = this.consume();
 
       if (char === "!") {
-        this.state = 'markupDeclaration';
+        this.transitionTo('markupDeclaration');
       } else if (char === "/") {
-        this.state = 'endTagOpen';
+        this.transitionTo('endTagOpen');
       } else if (isAlpha(char)) {
-        this.state = 'tagName';
+        this.transitionTo('tagName');
         this.delegate.beginStartTag();
         this.delegate.appendToTagName(char.toLowerCase());
       }
@@ -153,7 +160,7 @@ export default class EventedTokenizer {
 
       if (char === "-" && this.input.charAt(this.index) === "-") {
         this.consume();
-        this.state = 'commentStart';
+        this.transitionTo('commentStart');
         this.delegate.beginComment();
       }
     },
@@ -162,13 +169,13 @@ export default class EventedTokenizer {
       let char = this.consume();
 
       if (char === "-") {
-        this.state = 'commentStartDash';
+        this.transitionTo('commentStartDash');
       } else if (char === ">") {
         this.delegate.finishComment();
-        this.state = 'beforeData';
+        this.transitionTo('beforeData');
       } else {
         this.delegate.appendToCommentData(char);
-        this.state = 'comment';
+        this.transitionTo('comment');
       }
     },
 
@@ -176,13 +183,13 @@ export default class EventedTokenizer {
       let char = this.consume();
 
       if (char === "-") {
-        this.state = 'commentEnd';
+        this.transitionTo('commentEnd');
       } else if (char === ">") {
         this.delegate.finishComment();
-        this.state = 'beforeData';
+        this.transitionTo('beforeData');
       } else {
         this.delegate.appendToCommentData("-");
-        this.state = 'comment';
+        this.transitionTo('comment');
       }
     },
 
@@ -190,7 +197,7 @@ export default class EventedTokenizer {
       let char = this.consume();
 
       if (char === "-") {
-        this.state = 'commentEndDash';
+        this.transitionTo('commentEndDash');
       } else {
         this.delegate.appendToCommentData(char);
       }
@@ -200,10 +207,10 @@ export default class EventedTokenizer {
       let char = this.consume();
 
       if (char === "-") {
-        this.state = 'commentEnd';
+        this.transitionTo('commentEnd');
       } else {
         this.delegate.appendToCommentData("-" + char);
-        this.state = 'comment';
+        this.transitionTo('comment');
       }
     },
 
@@ -212,10 +219,10 @@ export default class EventedTokenizer {
 
       if (char === ">") {
         this.delegate.finishComment();
-        this.state = 'beforeData';
+        this.transitionTo('beforeData');
       } else {
         this.delegate.appendToCommentData("--" + char);
-        this.state = 'comment';
+        this.transitionTo('comment');
       }
     },
 
@@ -223,12 +230,12 @@ export default class EventedTokenizer {
       let char = this.consume();
 
       if (isSpace(char)) {
-        this.state = 'beforeAttributeName';
+        this.transitionTo('beforeAttributeName');
       } else if (char === "/") {
-        this.state = 'selfClosingStartTag';
+        this.transitionTo('selfClosingStartTag');
       } else if (char === ">") {
         this.delegate.finishTag();
-        this.state = 'beforeData';
+        this.transitionTo('beforeData');
       } else {
         this.delegate.appendToTagName(char);
       }
@@ -241,20 +248,20 @@ export default class EventedTokenizer {
         this.consume();
         return;
       } else if (char === "/") {
-        this.state = 'selfClosingStartTag';
+        this.transitionTo('selfClosingStartTag');
         this.consume();
       } else if (char === ">") {
         this.consume();
         this.delegate.finishTag();
-        this.state = 'beforeData';
+        this.transitionTo('beforeData');
       } else if (char === '=') {
         this.delegate.reportSyntaxError("attribute name cannot start with equals sign");
-        this.state = 'attributeName';
+        this.transitionTo('attributeName');
         this.delegate.beginAttribute();
         this.consume();
         this.delegate.appendToAttributeName(char);
       } else {
-        this.state = 'attributeName';
+        this.transitionTo('attributeName');
         this.delegate.beginAttribute();
       }
     },
@@ -263,22 +270,22 @@ export default class EventedTokenizer {
       let char = this.peek();
 
       if (isSpace(char)) {
-        this.state = 'afterAttributeName';
+        this.transitionTo('afterAttributeName');
         this.consume();
       } else if (char === "/") {
         this.delegate.beginAttributeValue(false);
         this.delegate.finishAttributeValue();
         this.consume();
-        this.state = 'selfClosingStartTag';
+        this.transitionTo('selfClosingStartTag');
       } else if (char === "=") {
-        this.state = 'beforeAttributeValue';
+        this.transitionTo('beforeAttributeValue');
         this.consume();
       } else if (char === ">") {
         this.delegate.beginAttributeValue(false);
         this.delegate.finishAttributeValue();
         this.consume();
         this.delegate.finishTag();
-        this.state = 'beforeData';
+        this.transitionTo('beforeData');
       } else if (char === '"' || char === "'" || char === '<') {
         this.delegate.reportSyntaxError(char + " is not a valid character within attribute names");
         this.consume();
@@ -299,21 +306,21 @@ export default class EventedTokenizer {
         this.delegate.beginAttributeValue(false);
         this.delegate.finishAttributeValue();
         this.consume();
-        this.state = 'selfClosingStartTag';
+        this.transitionTo('selfClosingStartTag');
       } else if (char === "=") {
         this.consume();
-        this.state = 'beforeAttributeValue';
+        this.transitionTo('beforeAttributeValue');
       } else if (char === ">") {
         this.delegate.beginAttributeValue(false);
         this.delegate.finishAttributeValue();
         this.consume();
         this.delegate.finishTag();
-        this.state = 'beforeData';
+        this.transitionTo('beforeData');
       } else {
         this.delegate.beginAttributeValue(false);
         this.delegate.finishAttributeValue();
         this.consume();
-        this.state = 'attributeName';
+        this.transitionTo('attributeName');
         this.delegate.beginAttribute();
         this.delegate.appendToAttributeName(char);
       }
@@ -325,11 +332,11 @@ export default class EventedTokenizer {
       if (isSpace(char)) {
         this.consume();
       } else if (char === '"') {
-        this.state = 'attributeValueDoubleQuoted';
+        this.transitionTo('attributeValueDoubleQuoted');
         this.delegate.beginAttributeValue(true);
         this.consume();
       } else if (char === "'") {
-        this.state = 'attributeValueSingleQuoted';
+        this.transitionTo('attributeValueSingleQuoted');
         this.delegate.beginAttributeValue(true);
         this.consume();
       } else if (char === ">") {
@@ -337,9 +344,9 @@ export default class EventedTokenizer {
         this.delegate.finishAttributeValue();
         this.consume();
         this.delegate.finishTag();
-        this.state = 'beforeData';
+        this.transitionTo('beforeData');
       } else {
-        this.state = 'attributeValueUnquoted';
+        this.transitionTo('attributeValueUnquoted');
         this.delegate.beginAttributeValue(false);
         this.consume();
         this.delegate.appendToAttributeValue(char);
@@ -351,7 +358,7 @@ export default class EventedTokenizer {
 
       if (char === '"') {
         this.delegate.finishAttributeValue();
-        this.state = 'afterAttributeValueQuoted';
+        this.transitionTo('afterAttributeValueQuoted');
       } else if (char === "&") {
         this.delegate.appendToAttributeValue(this.consumeCharRef('"') || "&");
       } else {
@@ -364,7 +371,7 @@ export default class EventedTokenizer {
 
       if (char === "'") {
         this.delegate.finishAttributeValue();
-        this.state = 'afterAttributeValueQuoted';
+        this.transitionTo('afterAttributeValueQuoted');
       } else if (char === "&") {
         this.delegate.appendToAttributeValue(this.consumeCharRef("'") || "&");
       } else {
@@ -378,7 +385,7 @@ export default class EventedTokenizer {
       if (isSpace(char)) {
         this.delegate.finishAttributeValue();
         this.consume();
-        this.state = 'beforeAttributeName';
+        this.transitionTo('beforeAttributeName');
       } else if (char === "&") {
         this.consume();
         this.delegate.appendToAttributeValue(this.consumeCharRef(">") || "&");
@@ -386,7 +393,7 @@ export default class EventedTokenizer {
         this.delegate.finishAttributeValue();
         this.consume();
         this.delegate.finishTag();
-        this.state = 'beforeData';
+        this.transitionTo('beforeData');
       } else {
         this.consume();
         this.delegate.appendToAttributeValue(char);
@@ -398,16 +405,16 @@ export default class EventedTokenizer {
 
       if (isSpace(char)) {
         this.consume();
-        this.state = 'beforeAttributeName';
+        this.transitionTo('beforeAttributeName');
       } else if (char === "/") {
         this.consume();
-        this.state = 'selfClosingStartTag';
+        this.transitionTo('selfClosingStartTag');
       } else if (char === ">") {
         this.consume();
         this.delegate.finishTag();
-        this.state = 'beforeData';
+        this.transitionTo('beforeData');
       } else {
-        this.state = 'beforeAttributeName';
+        this.transitionTo('beforeAttributeName');
       }
     },
 
@@ -418,9 +425,9 @@ export default class EventedTokenizer {
         this.consume();
         this.delegate.markTagAsSelfClosing();
         this.delegate.finishTag();
-        this.state = 'beforeData';
+        this.transitionTo('beforeData');
       } else {
-        this.state = 'beforeAttributeName';
+        this.transitionTo('beforeAttributeName');
       }
     },
 
@@ -428,7 +435,7 @@ export default class EventedTokenizer {
       let char = this.consume();
 
       if (isAlpha(char)) {
-        this.state = 'tagName';
+        this.transitionTo('tagName');
         this.delegate.beginEndTag();
         this.delegate.appendToTagName(char.toLowerCase());
       }

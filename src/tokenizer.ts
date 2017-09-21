@@ -25,13 +25,15 @@ export interface Token {
   syntaxError?: string;
 }
 
+export type Option<T> = T | null;
+
 export default class Tokenizer {
-  private token: Token = null;
+  private token: Option<Token> = null;
   private startLine = 1;
   private startColumn = 0;
   private tokenizer: EventedTokenizer;
   private tokens: Token[] = [];
-  private currentAttribute: Attribute = null;
+  private currentAttribute: Option<Attribute> = null;
 
   constructor(entityParser, private options: TokenizerOptions = {}) {
     this.tokenizer = new EventedTokenizer(this, entityParser);
@@ -63,7 +65,7 @@ export default class Tokenizer {
 
   addLocInfo() {
     if (this.options.loc) {
-      this.token.loc = {
+      this.token!.loc = {
         start: {
           line: this.startLine,
           column: this.startColumn
@@ -89,7 +91,7 @@ export default class Tokenizer {
   }
 
   appendToData(char) {
-    this.token.chars += char;
+    this.token!.chars += char;
   }
 
   finishData() {
@@ -107,7 +109,7 @@ export default class Tokenizer {
   }
 
   appendToCommentData(char) {
-    this.token.chars += char;
+    this.token!.chars += char;
   }
 
   finishComment() {
@@ -139,39 +141,39 @@ export default class Tokenizer {
   }
 
   markTagAsSelfClosing() {
-    this.token.selfClosing = true;
+    this.token!.selfClosing = true;
   }
 
   // Tags - name
 
   appendToTagName(char) {
-    this.token.tagName += char;
+    this.token!.tagName += char;
   }
 
   // Tags - attributes
 
   beginAttribute() {
     this.currentAttribute = ["", "", false];
-    this.token.attributes.push(this.currentAttribute);
+    this.token!.attributes!.push(this.currentAttribute);
   }
 
   appendToAttributeName(char) {
-    this.currentAttribute[0] += char;
+    this.currentAttribute![0] += char;
   }
 
   beginAttributeValue(isQuoted) {
-    this.currentAttribute[2] = isQuoted;
+    this.currentAttribute![2] = isQuoted;
   }
 
   appendToAttributeValue(char) {
-    this.currentAttribute[1] = this.currentAttribute[1] || "";
-    this.currentAttribute[1] += char;
+    this.currentAttribute![1] = this.currentAttribute![1] || "";
+    this.currentAttribute![1] += char;
   }
 
   finishAttributeValue() {
   }
 
   reportSyntaxError(message: string) {
-    this.token.syntaxError = message;
+    this.token!.syntaxError = message;
   }
 }
