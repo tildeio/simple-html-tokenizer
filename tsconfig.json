@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "es6",
+    "moduleResolution": "node",
+    "target": "es5",
+    "newLine": "LF",
+    "declaration": true,
+    "strictNullChecks": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "outDir": "ts-dist"
+  },
+  "include": ["**/*"]
+}

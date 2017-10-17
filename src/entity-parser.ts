@@ -1,4 +1,4 @@
-interface Dict<T> {
+export interface Dict<T> {
   [index: string]: T;
 }
 
