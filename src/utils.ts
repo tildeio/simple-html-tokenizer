@@ -16,7 +16,7 @@ export function preprocessInput(input: string): string {
 
 export type opaque = {} | void;
 export type Option<T> = T | null;
-export type Maybe<T> = Option<T> | null;
+export type Maybe<T> = Option<T> | undefined | void;
 
 export function unwrap<T>(maybe: Maybe<T>, msg?: string): T {
   if (!maybe) throw new Error(`${msg || 'value'} was null`);

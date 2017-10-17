@@ -1,4 +1,5 @@
 import EventedTokenizer from './evented-tokenizer';
+import { unwrap } from './utils';
 
 export interface TokenizerOptions {
   loc?: any;
@@ -25,16 +26,28 @@ export interface Token {
   syntaxError?: string;
 }
 
+interface TokenWithAttributes extends Token {
+  attributes: Attribute[];
+}
+
 export default class Tokenizer {
-  private token: Token = null;
+  private _token: Token | null = null;
   private startLine = 1;
   private startColumn = 0;
   private tokenizer: EventedTokenizer;
   private tokens: Token[] = [];
-  private currentAttribute: Attribute = null;
+  private currentAttribute: Attribute | null = null;
 
   constructor(entityParser, private options: TokenizerOptions = {}) {
     this.tokenizer = new EventedTokenizer(this, entityParser);
+  }
+
+  get token(): Token {
+    return unwrap(this._token);
+  }
+
+  set token(value: Token) {
+    this._token = value;
   }
 
   tokenize(input) {
@@ -56,7 +69,7 @@ export default class Tokenizer {
   }
 
   reset() {
-    this.token = null;
+    this._token = null;
     this.startLine = 1;
     this.startColumn = 0;
   }
@@ -151,21 +164,26 @@ export default class Tokenizer {
   // Tags - attributes
 
   beginAttribute() {
+    let attributes = unwrap(this.token.attributes, "current token's attributs");
+
     this.currentAttribute = ["", "", false];
-    this.token.attributes.push(this.currentAttribute);
+    attributes.push(this.currentAttribute);
   }
 
   appendToAttributeName(char) {
-    this.currentAttribute[0] += char;
+    let currentAttribute = unwrap(this.currentAttribute);
+    currentAttribute[0] += char;
   }
 
   beginAttributeValue(isQuoted) {
-    this.currentAttribute[2] = isQuoted;
+    let currentAttribute = unwrap(this.currentAttribute);
+    currentAttribute[2] = isQuoted;
   }
 
   appendToAttributeValue(char) {
-    this.currentAttribute[1] = this.currentAttribute[1] || "";
-    this.currentAttribute[1] += char;
+    let currentAttribute = unwrap(this.currentAttribute);
+    currentAttribute[1] = currentAttribute[1] || "";
+    currentAttribute[1] += char;
   }
 
   finishAttributeValue() {
