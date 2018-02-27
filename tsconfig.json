@@ -6,9 +6,8 @@
     "newLine": "LF",
     "declaration": true,
     "strictNullChecks": true,
-    "inlineSourceMap": true,
-    "inlineSources": true,
-    "outDir": "ts-dist"
+    "sourceMap": true,
+    "outDir": "dist"
   },
-  "include": ["**/*"]
+  "files": ["src/index.ts"]
 }
