@@ -1,7 +1,7 @@
 import { preprocessInput, isAlpha, isSpace } from './utils';
 
-export type States = 'beforeData' | 'data' | 'tagOpen' | 'endTagOpen' | 'markupDeclaration' | 'commentStart' | 'comment' | 'commentStartDash' | 'commentEnd' | 'commentEndDash' | 'beforeAttributeName' | 'attributeName' | 'afterAttributeName' | 'selfClosingStartTag' | 'attributeValueDoubleQuoted' | 'attributeValueSingleQuoted' |
-'attributeValueUnquoted' | 'attributeValueQuoted';
+export type States = 'beforeData' | 'data' | 'tagOpen' | 'tagName' | 'endTagOpen' | 'markupDeclaration' | 'commentStart' | 'comment' | 'commentStartDash' | 'commentEnd' | 'commentEndDash' | 'beforeAttributeName' | 'attributeName' | 'afterAttributeName' | 'selfClosingStartTag' | 'beforeAttributeValue' | 'attributeValueDoubleQuoted' | 'attributeValueSingleQuoted' |
+'attributeValueUnquoted' | 'attributeValueQuoted' | 'afterAttributeValueQuoted';
 
 export interface EntityParser {
   parse(entity: string): string | undefined;
