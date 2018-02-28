@@ -5,8 +5,10 @@
     "target": "es5",
     "newLine": "LF",
     "declaration": true,
-    "strictNullChecks": true,
+    "strict": true,
     "sourceMap": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "outDir": "dist"
   },
   "files": ["src/index.ts"]
