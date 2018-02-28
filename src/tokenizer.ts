@@ -152,7 +152,6 @@ export default class Tokenizer {
   }
 
   // Tags - name
-
   appendToTagName(char: string) {
     this.token.tagName += char;
   }
