@@ -1,43 +1,8 @@
 import { preprocessInput, isAlpha, isSpace } from './utils';
-
-export type States = 'beforeData' | 'data' | 'tagOpen' | 'tagName' | 'endTagOpen' | 'markupDeclaration' | 'commentStart' | 'comment' | 'commentStartDash' | 'commentEnd' | 'commentEndDash' | 'beforeAttributeName' | 'attributeName' | 'afterAttributeName' | 'selfClosingStartTag' | 'beforeAttributeValue' | 'attributeValueDoubleQuoted' | 'attributeValueSingleQuoted' |
-'attributeValueUnquoted' | 'attributeValueQuoted' | 'afterAttributeValueQuoted';
-
-export interface EntityParser {
-  parse(entity: string): string | undefined;
-}
-
-export interface TokenizerDelegate {
-  reset(): void;
-  finishData(): void;
-  tagOpen?(): void;
-
-  beginData(): void;
-  appendToData(char: string): void;
-
-  beginStartTag(): void;
-  appendToTagName(char: string): void;
-
-  beginAttribute(): void;
-  appendToAttributeName(char: string): void;
-  beginAttributeValue(quoted: boolean): void;
-  appendToAttributeValue(char: string): void;
-  finishAttributeValue(): void;
-
-  markTagAsSelfClosing(): void;
-
-  beginEndTag(): void;
-  finishTag(): void;
-
-  beginComment(): void;
-  appendToCommentData(char: string): void;
-  finishComment(): void;
-
-  reportSyntaxError(error: string): void;
-}
+import { EntityParser, TokenizerDelegate, TokenizerStates } from './types';
 
 export default class EventedTokenizer {
-  public state: States = 'beforeData';
+  public state: TokenizerStates = 'beforeData';
 
   public line = -1;
   public column = -1;
@@ -65,7 +30,7 @@ export default class EventedTokenizer {
     this.delegate.reset();
   }
 
-  transitionTo(state: States) {
+  transitionTo(state: TokenizerStates) {
     this.state = state;
   }
 
@@ -187,7 +152,7 @@ export default class EventedTokenizer {
       } else if (isAlpha(char)) {
         this.transitionTo('tagName');
         this.delegate.beginStartTag();
-        this.delegate.appendToTagName(char.toLowerCase());
+        this.delegate.appendToTagName(char);
       }
     },
 
@@ -473,7 +438,7 @@ export default class EventedTokenizer {
       if (isAlpha(char)) {
         this.transitionTo('tagName');
         this.delegate.beginEndTag();
-        this.delegate.appendToTagName(char.toLowerCase());
+        this.delegate.appendToTagName(char);
       }
     }
   };
