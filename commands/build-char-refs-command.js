@@ -47,7 +47,7 @@ function codepointsLiteral(codepoints) {
 }
 
 function buildEntitiesModule(data) {
-  var dest = 'export default {\n';
+  var dest = `// generated do not edit\nexport default {\n`;
   var seen = Object.create(null);
   var entities = Object.keys(data);
   var len = entities.length;

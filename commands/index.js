@@ -8,7 +8,8 @@ module.exports = {
 
   includedCommands: function() {
     return {
-      'build-char-refs': require('./build-char-refs-command.js')
+      'build-char-refs': require('./build-char-refs-command.js'),
+      'build-tokenizer-states': require('./build-tokenizer-states.js')
     };
   }
 };

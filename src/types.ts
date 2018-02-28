@@ -92,5 +92,4 @@ export interface TokenizerDelegate {
   reportSyntaxError(error: string): void;
 }
 
-export type TokenizerStates = 'beforeData' | 'data' | 'tagOpen' | 'tagName' | 'endTagOpen' | 'markupDeclaration' | 'commentStart' | 'comment' | 'commentStartDash' | 'commentEnd' | 'commentEndDash' | 'beforeAttributeName' | 'attributeName' | 'afterAttributeName' | 'selfClosingStartTag' | 'beforeAttributeValue' | 'attributeValueDoubleQuoted' | 'attributeValueSingleQuoted' |
-'attributeValueUnquoted' | 'attributeValueQuoted' | 'afterAttributeValueQuoted';
+export { TokenizerState } from './tokenizer-states';
