@@ -66,7 +66,7 @@ export interface TokenMap {
 export interface TokenizerDelegate {
   reset(): void;
   finishData(): void;
-  tagOpen?(): void;
+  tagOpen(): void;
 
   beginData(): void;
   appendToData(char: string): void;

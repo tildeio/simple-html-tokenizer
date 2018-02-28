@@ -6,8 +6,6 @@ export default class EventedTokenizer {
 
   public line = -1;
   public column = -1;
-  public tagLine = -1;
-  public tagColumn = -1;
 
   private input = '';
   private index = -1;
@@ -23,9 +21,6 @@ export default class EventedTokenizer {
     this.index = 0;
     this.line = 1;
     this.column = 0;
-
-    this.tagLine = -1;
-    this.tagColumn = -1;
 
     this.delegate.reset();
   }
@@ -105,13 +100,7 @@ export default class EventedTokenizer {
   }
 
   markTagStart() {
-    // these properties to be removed in next major bump
-    this.tagLine = this.line;
-    this.tagColumn = this.column;
-
-    if (this.delegate.tagOpen) {
-      this.delegate.tagOpen();
-    }
+    this.delegate.tagOpen();
   }
 
   states: { [k in TokenizerState]?: (this: EventedTokenizer) => void } = {

@@ -133,6 +133,8 @@ export default class Tokenizer implements TokenizerDelegate {
 
   // Tags - basic
 
+  tagOpen() {}
+
   beginStartTag() {
     this.push({
       type: TokenType.StartTag,
