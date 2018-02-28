@@ -3,7 +3,7 @@ import { unwrap } from './utils';
 
 export interface TokenizerOptions {
   loc?: any;
-};
+}
 
 export type Attribute = [string, string, boolean];
 

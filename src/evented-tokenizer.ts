@@ -3,12 +3,12 @@ import { preprocessInput, isAlpha, isSpace } from './utils';
 export default class EventedTokenizer {
   private state: any = null;
   private input: any = null;
-  private index: number = -1;
-  private tagLine: number = -1;
-  private tagColumn: number = -1;
+  private index = -1;
+  private tagLine = -1;
+  private tagColumn = -1;
 
-  public line: number = -1;
-  public column: number = -1;
+  public line = -1;
+  public column = -1;
 
   constructor(private delegate, private entityParser) {
     this.reset();
