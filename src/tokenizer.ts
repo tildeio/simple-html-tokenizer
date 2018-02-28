@@ -1,8 +1,9 @@
-import EventedTokenizer from './evented-tokenizer';
+import EventedTokenizer, { EntityParser } from './evented-tokenizer';
+import { unwrap } from './utils';
 
 export interface TokenizerOptions {
-  loc?: any;
-};
+  loc?: boolean;
+}
 
 export type Attribute = [string, string, boolean];
 
@@ -25,27 +26,33 @@ export interface Token {
   syntaxError?: string;
 }
 
-export type Option<T> = T | null;
-
 export default class Tokenizer {
-  private token: Option<Token> = null;
+  private _token: Token | null = null;
   private startLine = 1;
   private startColumn = 0;
   private tokenizer: EventedTokenizer;
   private tokens: Token[] = [];
-  private currentAttribute: Option<Attribute> = null;
+  private currentAttribute: Attribute | null = null;
 
-  constructor(entityParser, private options: TokenizerOptions = {}) {
+  constructor(entityParser: EntityParser, private options: TokenizerOptions = {}) {
     this.tokenizer = new EventedTokenizer(this, entityParser);
   }
 
-  tokenize(input) {
+  get token(): Token {
+    return unwrap(this._token);
+  }
+
+  set token(value: Token) {
+    this._token = value;
+  }
+
+  tokenize(input: string) {
     this.tokens = [];
     this.tokenizer.tokenize(input);
     return this.tokens;
   }
 
-  tokenizePart(input) {
+  tokenizePart(input: string) {
     this.tokens = [];
     this.tokenizer.tokenizePart(input);
     return this.tokens;
@@ -58,14 +65,14 @@ export default class Tokenizer {
   }
 
   reset() {
-    this.token = null;
+    this._token = null;
     this.startLine = 1;
     this.startColumn = 0;
   }
 
   addLocInfo() {
     if (this.options.loc) {
-      this.token!.loc = {
+      this.token.loc = {
         start: {
           line: this.startLine,
           column: this.startColumn
@@ -90,8 +97,8 @@ export default class Tokenizer {
     this.tokens.push(this.token);
   }
 
-  appendToData(char) {
-    this.token!.chars += char;
+  appendToData(char: string) {
+    this.token.chars += char;
   }
 
   finishData() {
@@ -108,8 +115,8 @@ export default class Tokenizer {
     this.tokens.push(this.token);
   }
 
-  appendToCommentData(char) {
-    this.token!.chars += char;
+  appendToCommentData(char: string) {
+    this.token.chars += char;
   }
 
   finishComment() {
@@ -141,39 +148,43 @@ export default class Tokenizer {
   }
 
   markTagAsSelfClosing() {
-    this.token!.selfClosing = true;
+    this.token.selfClosing = true;
   }
 
   // Tags - name
-
-  appendToTagName(char) {
-    this.token!.tagName += char;
+  appendToTagName(char: string) {
+    this.token.tagName += char;
   }
 
   // Tags - attributes
 
   beginAttribute() {
+    let attributes = unwrap(this.token.attributes, "current token's attributs");
+
     this.currentAttribute = ["", "", false];
-    this.token!.attributes!.push(this.currentAttribute);
+    attributes.push(this.currentAttribute);
   }
 
-  appendToAttributeName(char) {
-    this.currentAttribute![0] += char;
+  appendToAttributeName(char: string) {
+    let currentAttribute = unwrap(this.currentAttribute);
+    currentAttribute[0] += char;
   }
 
-  beginAttributeValue(isQuoted) {
-    this.currentAttribute![2] = isQuoted;
+  beginAttributeValue(isQuoted: boolean) {
+    let currentAttribute = unwrap(this.currentAttribute);
+    currentAttribute[2] = isQuoted;
   }
 
-  appendToAttributeValue(char) {
-    this.currentAttribute![1] = this.currentAttribute![1] || "";
-    this.currentAttribute![1] += char;
+  appendToAttributeValue(char: string) {
+    let currentAttribute = unwrap(this.currentAttribute);
+    currentAttribute[1] = currentAttribute[1] || "";
+    currentAttribute[1] += char;
   }
 
   finishAttributeValue() {
   }
 
   reportSyntaxError(message: string) {
-    this.token!.syntaxError = message;
+    this.token.syntaxError = message;
   }
 }

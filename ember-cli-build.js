@@ -1,45 +1,38 @@
 var Funnel = require('broccoli-funnel');
 var Rollup = require('broccoli-rollup');
 var JSHint = require('broccoli-jshint');
-var TypeScript = require('broccoli-typescript-compiler').TypeScript;
+var typescript = require('broccoli-typescript-compiler').typescript;
 var TSLint = require('broccoli-tslinter');
 var MergeTrees = require('broccoli-merge-trees');
 var concat = require('broccoli-concat');
+var sourcemaps = require('rollup-plugin-sourcemaps');
 
 module.exports = function(/* defaults */) {
   var srcTS = new Funnel('src', {
     destDir: '/src'
   });
 
-  var src = new TypeScript(srcTS, {
-    tsconfig: {
-      compilerOptions: {
-        module: 'es6',
-        moduleResolution: 'node',
-        target: 'es5',
-        newLine: 'LF',
-        declaration: true,
-        strictNullChecks: true,
-        inlineSourceMap: true,
-        inlineSources: true
-      },
-      include: ['**/*']
-    }
+  var src = typescript(srcTS, {
+    workingPath: __dirname
   });
 
   var es6 = new Funnel(src, {
-    srcDir: '/src',
     destDir: '/es6'
   });
 
-  var bundled = new Rollup(src, {
+  var bundled = new Rollup(
+    new MergeTrees([srcTS, es6]), {
     rollup: {
-      entry: 'src/index.js',
-
-      sourceMap: true,
-      dest: 'simple-html-tokenizer.js',
-      format: 'umd',
-      moduleName: 'HTML5Tokenizer'
+      input: 'es6/index.js',
+      plugins: [
+        sourcemaps(),
+      ],
+      output: [{
+        file: 'simple-html-tokenizer.js',
+        format: 'umd',
+        sourcemap: true,
+        moduleName: 'HTML5Tokenizer'
+      }]
     }
   });
 
