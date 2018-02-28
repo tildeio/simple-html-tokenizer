@@ -1,8 +1,8 @@
-import EventedTokenizer from './evented-tokenizer';
+import EventedTokenizer, { EntityParser } from './evented-tokenizer';
 import { unwrap } from './utils';
 
 export interface TokenizerOptions {
-  loc?: any;
+  loc?: boolean;
 }
 
 export type Attribute = [string, string, boolean];
@@ -26,10 +26,6 @@ export interface Token {
   syntaxError?: string;
 }
 
-interface TokenWithAttributes extends Token {
-  attributes: Attribute[];
-}
-
 export default class Tokenizer {
   private _token: Token | null = null;
   private startLine = 1;
@@ -38,7 +34,7 @@ export default class Tokenizer {
   private tokens: Token[] = [];
   private currentAttribute: Attribute | null = null;
 
-  constructor(entityParser, private options: TokenizerOptions = {}) {
+  constructor(entityParser: EntityParser, private options: TokenizerOptions = {}) {
     this.tokenizer = new EventedTokenizer(this, entityParser);
   }
 
@@ -50,13 +46,13 @@ export default class Tokenizer {
     this._token = value;
   }
 
-  tokenize(input) {
+  tokenize(input: string) {
     this.tokens = [];
     this.tokenizer.tokenize(input);
     return this.tokens;
   }
 
-  tokenizePart(input) {
+  tokenizePart(input: string) {
     this.tokens = [];
     this.tokenizer.tokenizePart(input);
     return this.tokens;
@@ -101,7 +97,7 @@ export default class Tokenizer {
     this.tokens.push(this.token);
   }
 
-  appendToData(char) {
+  appendToData(char: string) {
     this.token.chars += char;
   }
 
@@ -119,7 +115,7 @@ export default class Tokenizer {
     this.tokens.push(this.token);
   }
 
-  appendToCommentData(char) {
+  appendToCommentData(char: string) {
     this.token.chars += char;
   }
 
@@ -157,7 +153,7 @@ export default class Tokenizer {
 
   // Tags - name
 
-  appendToTagName(char) {
+  appendToTagName(char: string) {
     this.token.tagName += char;
   }
 
@@ -170,17 +166,17 @@ export default class Tokenizer {
     attributes.push(this.currentAttribute);
   }
 
-  appendToAttributeName(char) {
+  appendToAttributeName(char: string) {
     let currentAttribute = unwrap(this.currentAttribute);
     currentAttribute[0] += char;
   }
 
-  beginAttributeValue(isQuoted) {
+  beginAttributeValue(isQuoted: boolean) {
     let currentAttribute = unwrap(this.currentAttribute);
     currentAttribute[2] = isQuoted;
   }
 
-  appendToAttributeValue(char) {
+  appendToAttributeValue(char: string) {
     let currentAttribute = unwrap(this.currentAttribute);
     currentAttribute[1] = currentAttribute[1] || "";
     currentAttribute[1] += char;

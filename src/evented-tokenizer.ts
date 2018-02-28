@@ -1,16 +1,50 @@
 import { preprocessInput, isAlpha, isSpace } from './utils';
 
+export interface EntityParser {
+  parse(entity: string): string | undefined;
+}
+
+export interface TokenizerDelegate {
+  reset(): void;
+  finishData(): void;
+  tagOpen?(): void;
+
+  beginData(): void;
+  appendToData(char: string): void;
+
+  beginStartTag(): void;
+  appendToTagName(char: string): void;
+
+  beginAttribute(): void;
+  appendToAttributeName(char: string): void;
+  beginAttributeValue(quoted: boolean): void;
+  appendToAttributeValue(char: string): void;
+  finishAttributeValue(): void;
+
+  markTagAsSelfClosing(): void;
+
+  beginEndTag(): void;
+  finishTag(): void;
+
+  beginComment(): void;
+  appendToCommentData(char: string): void;
+  finishComment(): void;
+
+  reportSyntaxError(error: string): void;
+}
+
 export default class EventedTokenizer {
-  private state: any = null;
-  private input: any = null;
-  private index = -1;
-  private tagLine = -1;
-  private tagColumn = -1;
+  public state = 'beforeData';
 
   public line = -1;
   public column = -1;
+  public tagLine = -1;
+  public tagColumn = -1;
 
-  constructor(private delegate, private entityParser) {
+  private input = '';
+  private index = -1;
+
+  constructor(private delegate: TokenizerDelegate, private entityParser: EntityParser) {
     this.reset();
   }
 
@@ -28,13 +62,13 @@ export default class EventedTokenizer {
     this.delegate.reset();
   }
 
-  tokenize(input) {
+  tokenize(input: string) {
     this.reset();
     this.tokenizePart(input);
     this.tokenizeEOF();
   }
 
-  tokenizePart(input) {
+  tokenizePart(input: string) {
     this.input += preprocessInput(input);
 
     while (this.index < this.input.length) {
@@ -103,7 +137,9 @@ export default class EventedTokenizer {
     }
   }
 
-  states = {
+  states: {
+    [state: string]: (this: EventedTokenizer) => void
+  } = {
     beforeData() {
       let char = this.peek();
 
@@ -353,7 +389,7 @@ export default class EventedTokenizer {
         this.delegate.finishAttributeValue();
         this.state = 'afterAttributeValueQuoted';
       } else if (char === "&") {
-        this.delegate.appendToAttributeValue(this.consumeCharRef('"') || "&");
+        this.delegate.appendToAttributeValue(this.consumeCharRef() || "&");
       } else {
         this.delegate.appendToAttributeValue(char);
       }
@@ -366,7 +402,7 @@ export default class EventedTokenizer {
         this.delegate.finishAttributeValue();
         this.state = 'afterAttributeValueQuoted';
       } else if (char === "&") {
-        this.delegate.appendToAttributeValue(this.consumeCharRef("'") || "&");
+        this.delegate.appendToAttributeValue(this.consumeCharRef() || "&");
       } else {
         this.delegate.appendToAttributeValue(char);
       }
@@ -381,7 +417,7 @@ export default class EventedTokenizer {
         this.state = 'beforeAttributeName';
       } else if (char === "&") {
         this.consume();
-        this.delegate.appendToAttributeValue(this.consumeCharRef(">") || "&");
+        this.delegate.appendToAttributeValue(this.consumeCharRef() || "&");
       } else if (char === ">") {
         this.delegate.finishAttributeValue();
         this.consume();

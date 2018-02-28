@@ -1,5 +1,5 @@
-export interface Dict<T> {
-  [index: string]: T;
+export interface NamedEntityMap {
+  [name: string]: string;
 }
 
 const HEXCHARCODE = /^#[xX]([A-Fa-f0-9]+)$/;
@@ -7,7 +7,7 @@ const CHARCODE    = /^#([0-9]+)$/;
 const NAMED       = /^([A-Za-z0-9]+)$/;
 
 export default class EntityParser {
-  constructor(private named: Dict<string>) {
+  constructor(private named: NamedEntityMap) {
   }
 
   parse(entity: string): string | undefined {
