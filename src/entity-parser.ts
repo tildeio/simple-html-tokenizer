@@ -1,6 +1,4 @@
-export interface NamedEntityMap {
-  [name: string]: string;
-}
+import { NamedEntityMap } from './types';
 
 const HEXCHARCODE = /^#[xX]([A-Fa-f0-9]+)$/;
 const CHARCODE    = /^#([0-9]+)$/;
