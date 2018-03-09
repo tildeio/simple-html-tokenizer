@@ -11,5 +11,5 @@ export function isAlpha(char: string): boolean {
 }
 
 export function preprocessInput(input: string): string {
-  return input.replace(CRLF, "\n");
+  return input.replace(CRLF, '\n');
 }
