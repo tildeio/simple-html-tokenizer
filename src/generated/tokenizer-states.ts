@@ -1,4 +1,7 @@
-// generated do not edit
+/**
+ * generated from https://raw.githubusercontent.com/w3c/html/26b5126f96f736f796b9e29718138919dd513744/sections/syntax.include
+ * do not edit
+ */
 export const enum TokenizerState {
   beforeData = 'beforeData',
   data = 'data',

@@ -6,7 +6,7 @@ import {
   TokenizerDelegate,
   TokenMap,
   TokenType,
-  TokenizerOptions,
+  TokenizerOptions
 } from './types';
 
 export default class Tokenizer implements TokenizerDelegate {
@@ -16,7 +16,10 @@ export default class Tokenizer implements TokenizerDelegate {
   private tokenizer: EventedTokenizer;
   private tokens: Token[] = [];
 
-  constructor(entityParser: EntityParser, private options: TokenizerOptions = {}) {
+  constructor(
+    entityParser: EntityParser,
+    private options: TokenizerOptions = {}
+  ) {
     this.tokenizer = new EventedTokenizer(this, entityParser);
   }
 
@@ -44,7 +47,10 @@ export default class Tokenizer implements TokenizerDelegate {
     this.startColumn = 0;
   }
 
-  current<T extends TokenType, U extends TokenType>(type1: T, type2: U): TokenMap[T] | TokenMap[U];
+  current<T extends TokenType, U extends TokenType>(
+    type1: T,
+    type2: U
+  ): TokenMap[T] | TokenMap[U];
   current<T extends TokenType>(type: T): TokenMap[T];
   current(): Token;
   current(): Token {
@@ -161,16 +167,13 @@ export default class Tokenizer implements TokenizerDelegate {
 
   // Tags - name
   appendToTagName(char: string) {
-    this.current(
-      TokenType.StartTag,
-      TokenType.EndTag,
-    ).tagName += char;
+    this.current(TokenType.StartTag, TokenType.EndTag).tagName += char;
   }
 
   // Tags - attributes
 
   beginAttribute() {
-    this.pushAttribute(["", "", false]);
+    this.pushAttribute(['', '', false]);
   }
 
   appendToAttributeName(char: string) {
@@ -185,8 +188,7 @@ export default class Tokenizer implements TokenizerDelegate {
     this.currentAttribute()[1] += char;
   }
 
-  finishAttributeValue() {
-  }
+  finishAttributeValue() {}
 
   reportSyntaxError(message: string) {
     this.current().syntaxError = message;

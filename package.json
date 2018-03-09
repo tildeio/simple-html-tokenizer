@@ -30,6 +30,7 @@
     "broccoli-tslinter": "^3.0.1",
     "broccoli-typescript-compiler": "^2.2.0",
     "ember-cli": "^3.0.0",
+    "got": "^8.2.0",
     "qunitjs": "^2.4.1",
     "rollup-plugin-sourcemaps": "^0.4.2",
     "tslint": "^5.9.1",

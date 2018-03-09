@@ -92,4 +92,4 @@ export interface TokenizerDelegate {
   reportSyntaxError(error: string): void;
 }
 
-export { TokenizerState } from './tokenizer-states';
+export { TokenizerState } from './generated/tokenizer-states';
