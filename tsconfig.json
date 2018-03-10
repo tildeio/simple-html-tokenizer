@@ -9,7 +9,11 @@
     "sourceMap": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "simple-html-tokenizer": ["src/index.ts"]
+    }
   },
-  "files": ["src/index.ts"]
+  "files": ["src/index.ts", "tests/tokenizer-tests.ts"]
 }
