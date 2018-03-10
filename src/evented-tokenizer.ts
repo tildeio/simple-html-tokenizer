@@ -147,7 +147,7 @@ export default class EventedTokenizer {
       } else if (isAlpha(char)) {
         this.transitionTo(TokenizerState.tagName);
         this.delegate.beginStartTag();
-        this.delegate.appendToTagName(char.toLowerCase());
+        this.delegate.appendToTagName(char);
       }
     },
 
@@ -437,7 +437,7 @@ export default class EventedTokenizer {
       if (isAlpha(char)) {
         this.transitionTo(TokenizerState.tagName);
         this.delegate.beginEndTag();
-        this.delegate.appendToTagName(char.toLowerCase());
+        this.delegate.appendToTagName(char);
       }
     }
   };
