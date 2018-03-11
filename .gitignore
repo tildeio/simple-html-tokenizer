@@ -3,12 +3,16 @@
 /tmp
 
 # dependencies
-/node_modules
-/bower_components
+node_modules/
 
-# misc
-/.sass-cache
-/connect.lock
-/coverage/*
+# npm pack
+package/
+*.tgz
+
+# coverage
+.nyc_output/
+coverage/
+
+# logs
 npm-debug.log*
 *.log

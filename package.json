@@ -2,43 +2,40 @@
   "name": "simple-html-tokenizer",
   "version": "0.4.3",
   "license": "MIT",
-  "description": "Simple HTML Tokenizer is a lightweight JavaScript library that can be used to tokenize the kind of HTML normally found in templates.",
-  "keywords": [
-    "html",
-    "tokenizer"
-  ],
+  "description":
+    "Simple HTML Tokenizer is a lightweight JavaScript library that can be used to tokenize the kind of HTML normally found in templates.",
+  "keywords": ["html", "tokenizer"],
   "repository": {
     "type": "git",
     "url": "https://github.com/tildeio/simple-html-tokenizer.git"
   },
   "main": "dist/simple-html-tokenizer.js",
   "module": "dist/es6/index.js",
-  "jsnext:main": "dist/es6/index.js",
-  "typings": "dist/es6/index.d.ts",
+  "types": "dist/es6/index.d.ts",
+  "files": ["dist", "!dist/tests", "src"],
   "scripts": {
     "build": "ember build",
-    "prepublish": "npm run build",
-    "test": "ember test",
-    "lint": "ember test -f jshint"
+    "prepare": "ember build",
+    "test": "ember test && nyc qunit dist/tests/tests.js",
+    "lint": "tslint -p tsconfig.json"
   },
   "devDependencies": {
+    "@types/qunit": "^2.5.0",
     "broccoli-concat": "^3.0.5",
     "broccoli-funnel": "^2.0.1",
-    "broccoli-jshint": "^2.1.0",
     "broccoli-merge-trees": "^3.0.0",
     "broccoli-rollup": "^2.0.0",
     "broccoli-tslinter": "^3.0.1",
     "broccoli-typescript-compiler": "^2.2.0",
     "ember-cli": "^3.0.0",
     "got": "^8.2.0",
-    "qunitjs": "^2.4.1",
+    "nyc": "^11.4.1",
+    "qunit": "^2.5.1",
     "rollup-plugin-sourcemaps": "^0.4.2",
     "tslint": "^5.9.1",
     "typescript": "^2.7.2"
   },
   "ember-addon": {
-    "paths": [
-      "commands"
-    ]
+    "paths": ["commands", "lib/symlink-self"]
   }
 }
