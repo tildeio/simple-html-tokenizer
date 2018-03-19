@@ -23,14 +23,14 @@ module.exports = function(/* defaults */) {
     buildPath: __dirname
   });
 
-  var distEs6 = new Funnel(distSrcAndTests, {
+  var distSrc = new Funnel(distSrcAndTests, {
     srcDir: '/dist/src',
-    destDir: '/dist/es6'
+    destDir: '/dist/src'
   });
 
-  var distUmd = new Rollup(new MergeTrees([src, distEs6]), {
+  var distBundle = new Rollup(new MergeTrees([src, distSrc]), {
     rollup: {
-      input: 'dist/es6/index.js',
+      input: 'dist/src/index.js',
       plugins: [sourcemaps()],
       output: [
         {
@@ -38,6 +38,11 @@ module.exports = function(/* defaults */) {
           format: 'umd',
           sourcemap: true,
           name: 'HTML5Tokenizer'
+        },
+        {
+          file: 'dist/es6/index.js',
+          format: 'es',
+          sourcemap: true
         }
       ]
     }
@@ -84,10 +89,22 @@ module.exports = function(/* defaults */) {
     destDir: '/dist/tests'
   });
 
-  var dist = new MergeTrees([distEs6, distUmd, allTests, testSupport, qunit]);
+  var distTypes = new Funnel(distSrc, {
+    include: ['**/*.d.ts'],
+    srcDir: '/dist/src',
+    destDir: '/dist/types'
+  });
+
+  var dist = new MergeTrees([
+    distBundle,
+    distTypes,
+    allTests,
+    testSupport,
+    qunit
+  ]);
 
   return new Funnel(dist, {
     srcDir: '/dist',
     destDir: '/'
   });
-}
+};

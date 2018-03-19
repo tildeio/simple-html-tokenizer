@@ -11,8 +11,8 @@
   },
   "main": "dist/simple-html-tokenizer.js",
   "module": "dist/es6/index.js",
-  "types": "dist/es6/index.d.ts",
-  "files": ["dist", "!dist/tests", "src"],
+  "types": "dist/types/index.d.ts",
+  "files": ["dist", "!dist/tests"],
   "scripts": {
     "build": "ember build",
     "prepare": "ember build",
