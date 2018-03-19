@@ -1,10 +1,12 @@
 {
   "name": "simple-html-tokenizer",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "license": "MIT",
-  "description":
-    "Simple HTML Tokenizer is a lightweight JavaScript library that can be used to tokenize the kind of HTML normally found in templates.",
-  "keywords": ["html", "tokenizer"],
+  "description": "Simple HTML Tokenizer is a lightweight JavaScript library that can be used to tokenize the kind of HTML normally found in templates.",
+  "keywords": [
+    "html",
+    "tokenizer"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/tildeio/simple-html-tokenizer.git"
@@ -12,7 +14,10 @@
   "main": "dist/simple-html-tokenizer.js",
   "module": "dist/es6/index.js",
   "types": "dist/types/index.d.ts",
-  "files": ["dist", "!dist/tests"],
+  "files": [
+    "dist",
+    "!dist/tests"
+  ],
   "scripts": {
     "build": "ember build",
     "prepare": "ember build",
@@ -36,6 +41,9 @@
     "typescript": "^2.7.2"
   },
   "ember-addon": {
-    "paths": ["commands", "lib/symlink-self"]
+    "paths": [
+      "commands",
+      "lib/symlink-self"
+    ]
   }
 }
