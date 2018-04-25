@@ -10,6 +10,8 @@ export default class EventedTokenizer {
   private input = '';
   private index = -1;
 
+  private tagNameBuffer = '';
+
   constructor(
     private delegate: TokenizerDelegate,
     private entityParser: EntityParser
@@ -106,6 +108,11 @@ export default class EventedTokenizer {
     this.delegate.tagOpen();
   }
 
+  private appendToTagName(char: string) : void {
+    this.tagNameBuffer += char;
+    this.delegate.appendToTagName(char);
+  }
+
   states: { [k in TokenizerState]?: (this: EventedTokenizer) => void } = {
     beforeData() {
       let char = this.peek();
@@ -115,6 +122,12 @@ export default class EventedTokenizer {
         this.markTagStart();
         this.consume();
       } else {
+        if (char === '\n') {
+          let tag = this.tagNameBuffer.toLowerCase();
+          if (tag === 'pre' || tag === 'textarea') {
+            this.consume();
+          }
+        }
         this.transitionTo(TokenizerState.data);
         this.delegate.beginData();
       }
@@ -146,8 +159,9 @@ export default class EventedTokenizer {
         this.transitionTo(TokenizerState.endTagOpen);
       } else if (isAlpha(char)) {
         this.transitionTo(TokenizerState.tagName);
+        this.tagNameBuffer = '';
         this.delegate.beginStartTag();
-        this.delegate.appendToTagName(char);
+        this.appendToTagName(char);
       }
     },
 
@@ -233,7 +247,7 @@ export default class EventedTokenizer {
         this.delegate.finishTag();
         this.transitionTo(TokenizerState.beforeData);
       } else {
-        this.delegate.appendToTagName(char);
+        this.appendToTagName(char);
       }
     },
 
@@ -436,8 +450,9 @@ export default class EventedTokenizer {
 
       if (isAlpha(char)) {
         this.transitionTo(TokenizerState.tagName);
+        this.tagNameBuffer = '';
         this.delegate.beginEndTag();
-        this.delegate.appendToTagName(char);
+        this.appendToTagName(char);
       }
     }
   };
