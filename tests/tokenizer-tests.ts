@@ -189,6 +189,24 @@ QUnit.test('Character references are expanded', function(assert) {
   ]);
 });
 
+// https://html.spec.whatwg.org/multipage/syntax.html#element-restrictions
+QUnit.test('A newline immediately following a <pre> tag is stripped', function(assert) {
+  let tokens = tokenize("<pre>\nhello</pre>");
+  assert.deepEqual(tokens, [startTag('pre'), chars('hello'), endTag('pre')]);
+});
+
+// https://html.spec.whatwg.org/multipage/syntax.html#element-restrictions
+QUnit.test('A newline immediately following a <PRE> tag is stripped', function(assert) {
+  let tokens = tokenize("<PRE>\nhello</PRE>");
+  assert.deepEqual(tokens, [startTag('PRE'), chars('hello'), endTag('PRE')]);
+});
+
+// https://html.spec.whatwg.org/multipage/syntax.html#element-restrictions
+QUnit.test('A newline immediately following a <textarea> tag is stripped', function(assert) {
+  let tokens = tokenize("<textarea>\nhello</textarea>");
+  assert.deepEqual(tokens, [startTag('textarea'), chars('hello'), endTag('textarea')]);
+});
+
 QUnit.module('simple-html-tokenizer - preprocessing');
 
 QUnit.test('Carriage returns are replaced with line feeds', function(assert) {
