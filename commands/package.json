@@ -2,5 +2,6 @@
   "name": "in-repo-commands",
   "keywords": [
     "ember-addon"
-  ]
+  ],
+  "version": "1.0.0"
 }
