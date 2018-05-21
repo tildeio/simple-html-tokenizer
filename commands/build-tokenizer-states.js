@@ -1,6 +1,7 @@
 'use strict';
 const tokenizerStates = require('./codegen/tokenizer-states');
 const codegen = require('./codegen');
+const path = require('path');
 
 module.exports = {
   name: 'build-tokenizer-states',
@@ -16,7 +17,7 @@ module.exports = {
       'html',
       'master',
       'sections/syntax.include',
-      'tokenizer-states.ts',
+      path.join(this.project.root, 'src', 'generated', 'tokenizer-states.ts'),
       tokenizerStates
     );
   }

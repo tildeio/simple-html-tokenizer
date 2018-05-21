@@ -1,9 +1,6 @@
 'use strict';
 const fs = require('fs');
-const path = require('path');
 const { getGithubRefSHA, githubContentURL, getText } = require('./utils');
-
-const GENERATED_ROOT = path.resolve(__dirname, '../src/generated');
 
 module.exports = async function codegen(
   ui,
@@ -26,6 +23,6 @@ module.exports = async function codegen(
  */
 `;
   code += generator(body);
-  fs.writeFileSync(path.resolve(GENERATED_ROOT, dest), code);
+  fs.writeFileSync(dest, code);
   ui.writeInfoLine(`generated ${dest}`);
 };

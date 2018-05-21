@@ -20,6 +20,7 @@
   ],
   "scripts": {
     "build": "ember build",
+    "prepublish": "rm -rf node_modules/in-repo-commands && ln -s ../commands node_modules/in-repo-commands && rm -rf node_modules/symlink-self && ln -s ../lib/symlink-self node_modules/symlink-self",
     "prepare": "ember build",
     "test": "ember test && nyc qunit dist/tests/tests.js",
     "lint": "tslint -p tsconfig.json"
@@ -34,16 +35,12 @@
     "broccoli-typescript-compiler": "^2.2.0",
     "ember-cli": "^3.0.0",
     "got": "^8.2.0",
+    "in-repo-commands": "file:./commands",
     "nyc": "^11.4.1",
     "qunit": "^2.5.1",
     "rollup-plugin-sourcemaps": "^0.4.2",
+    "symlink-self": "file:./lib/symlink-self",
     "tslint": "^5.9.1",
     "typescript": "^2.7.2"
-  },
-  "ember-addon": {
-    "paths": [
-      "commands",
-      "lib/symlink-self"
-    ]
   }
 }

@@ -1,6 +1,7 @@
 'use strict';
 const entities = require('./codegen/entities');
 const codegen = require('./codegen');
+const path = require('path');
 
 module.exports = {
   name: 'build-char-refs',
@@ -16,7 +17,7 @@ module.exports = {
       'html',
       'master',
       'entities.json',
-      'html5-named-char-refs.ts',
+      path.join(this.project.root, 'src', 'generated', 'html5-named-char-refs.ts'),
       entities
     );
   }
