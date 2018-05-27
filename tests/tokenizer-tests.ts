@@ -207,6 +207,12 @@ QUnit.test('A newline immediately following a <textarea> tag is stripped', funct
   assert.deepEqual(tokens, [startTag('textarea'), chars('hello'), endTag('textarea')]);
 });
 
+// https://github.com/emberjs/rfcs/blob/master/text/0311-angle-bracket-invocation.md#dynamic-invocations
+QUnit.test('An Emberish named arg invocation', function(assert) {
+  let tokens = tokenize('<@foo></@foo>');
+  assert.deepEqual(tokens, [startTag('@foo'), endTag('@foo')]);
+});
+
 QUnit.module('simple-html-tokenizer - preprocessing');
 
 QUnit.test('Carriage returns are replaced with line feeds', function(assert) {
