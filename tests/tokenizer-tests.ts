@@ -134,6 +134,16 @@ QUnit.test(
   }
 );
 
+QUnit.test(
+  'A self-closing tag with an attribute with unquoted value without space before closing (regression)',
+  function(assert) {
+    let tokens = tokenize('<input data-foo=bar/>');
+    assert.deepEqual(tokens, [
+      startTag('input', [['data-foo', 'bar', false]], true)
+    ]);
+  }
+);
+
 QUnit.test('A tag with a / in the middle', function(assert) {
   let tokens = tokenize('<img / src="foo.png">');
   assert.deepEqual(tokens, [startTag('img', [['src', 'foo.png', true]])]);
