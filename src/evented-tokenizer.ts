@@ -401,6 +401,7 @@ export default class EventedTokenizer {
         this.consume();
         this.transitionTo(TokenizerState.beforeAttributeName);
       } else if (char === '/') {
+        this.delegate.finishAttributeValue();
         this.consume();
         this.transitionTo(TokenizerState.selfClosingStartTag);
       } else if (char === '&') {
