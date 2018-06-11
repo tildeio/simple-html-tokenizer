@@ -15,12 +15,14 @@ export default class Tokenizer implements TokenizerDelegate {
   private startColumn = 0;
   private tokenizer: EventedTokenizer;
   private tokens: Token[] = [];
+  private _currentAttribute?: Attribute;
 
   constructor(
     entityParser: EntityParser,
     private options: TokenizerOptions = {}
   ) {
     this.tokenizer = new EventedTokenizer(this, entityParser);
+    this._currentAttribute = undefined;
   }
 
   tokenize(input: string) {
@@ -75,15 +77,7 @@ export default class Tokenizer implements TokenizerDelegate {
   }
 
   currentAttribute() {
-    let { attributes } = this.current(TokenType.StartTag);
-    if (attributes.length === 0) {
-      throw new Error('expected to have an attribute started');
-    }
-    return attributes[attributes.length - 1];
-  }
-
-  pushAttribute(attribute: Attribute) {
-    this.current(TokenType.StartTag).attributes.push(attribute);
+    return this._currentAttribute;
   }
 
   addLocInfo() {
@@ -173,22 +167,24 @@ export default class Tokenizer implements TokenizerDelegate {
   // Tags - attributes
 
   beginAttribute() {
-    this.pushAttribute(['', '', false]);
+    this._currentAttribute = ['', '', false];
   }
 
   appendToAttributeName(char: string) {
-    this.currentAttribute()[0] += char;
+    this.currentAttribute()![0] += char;
   }
 
   beginAttributeValue(isQuoted: boolean) {
-    this.currentAttribute()[2] = isQuoted;
+    this.currentAttribute()![2] = isQuoted;
   }
 
   appendToAttributeValue(char: string) {
-    this.currentAttribute()[1] += char;
+    this.currentAttribute()![1] += char;
   }
 
-  finishAttributeValue() {}
+  finishAttributeValue() {
+    this.current(TokenType.StartTag).attributes.push(this._currentAttribute!);
+  }
 
   reportSyntaxError(message: string) {
     this.current().syntaxError = message;
