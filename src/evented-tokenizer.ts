@@ -333,9 +333,9 @@ export default class EventedTokenizer {
       } else {
         this.delegate.beginAttributeValue(false);
         this.delegate.finishAttributeValue();
-        this.consume();
         this.transitionTo(TokenizerState.attributeName);
         this.delegate.beginAttribute();
+        this.consume();
         this.delegate.appendToAttributeName(char);
       }
     },
