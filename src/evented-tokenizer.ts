@@ -157,7 +157,7 @@ export default class EventedTokenizer {
         this.transitionTo(TokenizerState.markupDeclarationOpen);
       } else if (char === '/') {
         this.transitionTo(TokenizerState.endTagOpen);
-      } else if (char === '@' || isAlpha(char)) {
+      } else if (char === '@' || char === ':' || isAlpha(char)) {
         this.transitionTo(TokenizerState.tagName);
         this.tagNameBuffer = '';
         this.delegate.beginStartTag();
@@ -452,7 +452,7 @@ export default class EventedTokenizer {
     endTagOpen() {
       let char = this.consume();
 
-      if (char === '@' || isAlpha(char)) {
+      if (char === '@' || char === ':' || isAlpha(char)) {
         this.transitionTo(TokenizerState.tagName);
         this.tagNameBuffer = '';
         this.delegate.beginEndTag();
