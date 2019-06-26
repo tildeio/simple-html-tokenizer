@@ -114,11 +114,19 @@ export default class EventedTokenizer {
     this.delegate.appendToTagName(char);
   }
 
+  private isIgnoredEndTag(): boolean {
+    let tag = this.tagNameBuffer.toLowerCase();
+
+    return (tag === 'title' && this.input.substr(this.index, 8) !== '</title>') ||
+      (tag === 'style' && this.input.substr(this.index, 8) !== '</style>') ||
+      (tag === 'script' && this.input.substr(this.index, 9) !== '</script>');
+  }
+
   states: { [k in TokenizerState]?: (this: EventedTokenizer) => void } = {
     beforeData() {
       let char = this.peek();
 
-      if (char === '<') {
+      if (char === '<' && !this.isIgnoredEndTag()) {
         this.transitionTo(TokenizerState.tagOpen);
         this.markTagStart();
         this.consume();
@@ -139,7 +147,7 @@ export default class EventedTokenizer {
     data() {
       let char = this.peek();
 
-      if (char === '<') {
+      if (char === '<' && !this.isIgnoredEndTag()) {
         this.delegate.finishData();
         this.transitionTo(TokenizerState.tagOpen);
         this.markTagStart();
