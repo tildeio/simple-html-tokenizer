@@ -205,6 +205,11 @@ QUnit.test('A newline immediately following a <pre> tag is stripped', function(a
   assert.deepEqual(tokens, [startTag('pre'), chars('hello'), endTag('pre')]);
 });
 
+QUnit.test('A newline immediately following a closing </pre> tag is not stripped', function(assert) {
+  let tokens = tokenize("\n<pre>\nhello</pre>\n");
+  assert.deepEqual(tokens, [chars('\n'), startTag('pre'), chars('hello'), endTag('pre'), chars('\n')]);
+});
+
 // https://html.spec.whatwg.org/multipage/syntax.html#element-restrictions
 QUnit.test('A newline immediately following a <PRE> tag is stripped', function(assert) {
   let tokens = tokenize("<PRE>\nhello</PRE>");

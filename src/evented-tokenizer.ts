@@ -22,6 +22,7 @@ export default class EventedTokenizer {
   reset() {
     this.transitionTo(TokenizerState.beforeData);
     this.input = '';
+    this.tagNameBuffer = '';
 
     this.index = 0;
     this.line = 1;
@@ -124,10 +125,12 @@ export default class EventedTokenizer {
       } else {
         if (char === '\n') {
           let tag = this.tagNameBuffer.toLowerCase();
+
           if (tag === 'pre' || tag === 'textarea') {
             this.consume();
           }
         }
+
         this.transitionTo(TokenizerState.data);
         this.delegate.beginData();
       }
@@ -168,7 +171,7 @@ export default class EventedTokenizer {
     markupDeclarationOpen() {
       let char = this.consume();
 
-      if (char === '-' && this.input.charAt(this.index) === '-') {
+      if (char === '-' && this.peek() === '-') {
         this.consume();
         this.transitionTo(TokenizerState.commentStart);
         this.delegate.beginComment();
@@ -246,6 +249,24 @@ export default class EventedTokenizer {
       } else if (char === '>') {
         this.delegate.finishTag();
         this.transitionTo(TokenizerState.beforeData);
+      } else {
+        this.appendToTagName(char);
+      }
+    },
+
+    endTagName() {
+      let char = this.consume();
+
+      if (isSpace(char)) {
+        this.transitionTo(TokenizerState.beforeAttributeName);
+        this.tagNameBuffer = '';
+      } else if (char === '/') {
+        this.transitionTo(TokenizerState.selfClosingStartTag);
+        this.tagNameBuffer = '';
+      } else if (char === '>') {
+        this.delegate.finishTag();
+        this.transitionTo(TokenizerState.beforeData);
+        this.tagNameBuffer = '';
       } else {
         this.appendToTagName(char);
       }
@@ -453,7 +474,7 @@ export default class EventedTokenizer {
       let char = this.consume();
 
       if (char === '@' || char === ':' || isAlpha(char)) {
-        this.transitionTo(TokenizerState.tagName);
+        this.transitionTo(TokenizerState.endTagName);
         this.tagNameBuffer = '';
         this.delegate.beginEndTag();
         this.appendToTagName(char);
