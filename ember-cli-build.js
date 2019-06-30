@@ -4,6 +4,8 @@ var typescript = require('broccoli-typescript-compiler').typescript;
 var TSLint = require('broccoli-tslinter');
 var MergeTrees = require('broccoli-merge-trees');
 var concat = require('broccoli-concat');
+var commonjs = require('rollup-plugin-commonjs');
+var resolve = require('rollup-plugin-node-resolve');
 var sourcemaps = require('rollup-plugin-sourcemaps');
 
 module.exports = function(/* defaults */) {
@@ -31,7 +33,7 @@ module.exports = function(/* defaults */) {
   var distBundle = new Rollup(new MergeTrees([src, distSrc]), {
     rollup: {
       input: 'dist/src/index.js',
-      plugins: [sourcemaps()],
+      plugins: [resolve(), commonjs(), sourcemaps()],
       output: [
         {
           file: 'dist/simple-html-tokenizer.js',

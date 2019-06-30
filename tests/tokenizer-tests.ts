@@ -185,16 +185,16 @@ QUnit.test('A (buggy) comment that contains two --', function(assert) {
 
 QUnit.test('Character references are expanded', function(assert) {
   let tokens = tokenize(
-    '&quot;Foo &amp; Bar&quot; &lt; &#60;&#x3c; &#x3C; &LT; &NotGreaterFullEqual; &Borksnorlax; &nleqq;'
+    '&quot;Foo &amp; Bar&quot; &lt; &#60;&#x3c; &#x3C; &LT; &NotGreaterFullEqual; &Borksnorlax; &nleqq; &#128517;'
   );
-  assert.deepEqual(tokens, [chars('"Foo & Bar" < << < < ≧̸ &Borksnorlax; ≦̸')]);
+  assert.deepEqual(tokens, [chars('"Foo & Bar" < << < < ≧̸ &Borksnorlax; ≦̸ 😅')]);
 
   tokens = tokenize(
-    "<div title='&quot;Foo &amp; Bar&quot; &blk12; &lt; &#60;&#x3c; &#x3C; &LT; &NotGreaterFullEqual; &Borksnorlax; &nleqq;'>"
+    "<div title='&quot;Foo &amp; Bar&quot; &blk12; &lt; &#60;&#x3c; &#x3C; &LT; &NotGreaterFullEqual; &Borksnorlax; &nleqq; &#128517;'>"
   );
   assert.deepEqual(tokens, [
     startTag('div', [
-      ['title', '"Foo & Bar" ▒ < << < < ≧̸ &Borksnorlax; ≦̸', true]
+      ['title', '"Foo & Bar" ▒ < << < < ≧̸ &Borksnorlax; ≦̸ 😅', true]
     ])
   ]);
 });
