@@ -146,13 +146,14 @@ export default class EventedTokenizer {
 
     data() {
       let char = this.peek();
+      let tag = this.tagNameBuffer.toLowerCase();
 
       if (char === '<' && !this.isIgnoredEndTag()) {
         this.delegate.finishData();
         this.transitionTo(TokenizerState.tagOpen);
         this.markTagStart();
         this.consume();
-      } else if (char === '&') {
+      } else if (char === '&' && tag !== 'script' && tag !== 'style') {
         this.consume();
         this.delegate.appendToData(this.consumeCharRef() || '&');
       } else {

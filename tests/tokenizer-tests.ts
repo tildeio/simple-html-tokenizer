@@ -231,13 +231,13 @@ QUnit.test('The title element content is always text', function(assert) {
 // https://html.spec.whatwg.org/multipage/semantics.html#the-style-element
 QUnit.test('The style element content is always text', function(assert) {
   let tokens = tokenize("<style>&quot;hey <b>there</b><!-- comment --></style>");
-  assert.deepEqual(tokens, [startTag('style'), chars('"hey <b>there</b><!-- comment -->'), endTag('style')]);
+  assert.deepEqual(tokens, [startTag('style'), chars('&quot;hey <b>there</b><!-- comment -->'), endTag('style')]);
 });
 
 // https://html.spec.whatwg.org/multipage/scripting.html#restrictions-for-contents-of-script-elements
 QUnit.test('The script element content restrictions', function(assert) {
   let tokens = tokenize("<script>&quot;hey <b>there</b><!-- comment --></script>");
-  assert.deepEqual(tokens, [startTag('script'), chars('"hey <b>there</b><!-- comment -->'), endTag('script')]);
+  assert.deepEqual(tokens, [startTag('script'), chars('&quot;hey <b>there</b><!-- comment -->'), endTag('script')]);
 });
 
 QUnit.test('Two following script tags', function(assert) {
