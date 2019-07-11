@@ -117,9 +117,9 @@ export default class EventedTokenizer {
   private isIgnoredEndTag(): boolean {
     let tag = this.tagNameBuffer.toLowerCase();
 
-    return (tag === 'title' && this.input.substr(this.index, 8) !== '</title>') ||
-      (tag === 'style' && this.input.substr(this.index, 8) !== '</style>') ||
-      (tag === 'script' && this.input.substr(this.index, 9) !== '</script>');
+    return (tag === 'title' && this.input.substring(this.index, this.index + 8) !== '</title>') ||
+      (tag === 'style' && this.input.substring(this.index, this.index + 8) !== '</style>') ||
+      (tag === 'script' && this.input.substring(this.index, this.index + 9) !== '</script>');
   }
 
   states: { [k in TokenizerState]?: (this: EventedTokenizer) => void } = {
