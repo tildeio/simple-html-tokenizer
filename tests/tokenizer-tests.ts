@@ -205,6 +205,11 @@ QUnit.test('A newline immediately following a <pre> tag is stripped', function(a
   assert.deepEqual(tokens, [startTag('pre'), chars('hello'), endTag('pre')]);
 });
 
+QUnit.test('A newline immediately following a closing </pre> tag is not stripped', function(assert) {
+  let tokens = tokenize("\n<pre>\nhello</pre>\n");
+  assert.deepEqual(tokens, [chars('\n'), startTag('pre'), chars('hello'), endTag('pre'), chars('\n')]);
+});
+
 // https://html.spec.whatwg.org/multipage/syntax.html#element-restrictions
 QUnit.test('A newline immediately following a <PRE> tag is stripped', function(assert) {
   let tokens = tokenize("<PRE>\nhello</PRE>");
@@ -215,6 +220,38 @@ QUnit.test('A newline immediately following a <PRE> tag is stripped', function(a
 QUnit.test('A newline immediately following a <textarea> tag is stripped', function(assert) {
   let tokens = tokenize("<textarea>\nhello</textarea>");
   assert.deepEqual(tokens, [startTag('textarea'), chars('hello'), endTag('textarea')]);
+});
+
+// https://html.spec.whatwg.org/multipage/semantics.html#the-title-element
+QUnit.test('The title element content is always text', function(assert) {
+  let tokens = tokenize("<title>&quot;hey <b>there</b><!-- comment --></title>");
+  assert.deepEqual(tokens, [startTag('title'), chars('"hey <b>there</b><!-- comment -->'), endTag('title')]);
+});
+
+// https://html.spec.whatwg.org/multipage/semantics.html#the-style-element
+QUnit.test('The style element content is always text', function(assert) {
+  let tokens = tokenize("<style>&quot;hey <b>there</b><!-- comment --></style>");
+  assert.deepEqual(tokens, [startTag('style'), chars('&quot;hey <b>there</b><!-- comment -->'), endTag('style')]);
+});
+
+// https://html.spec.whatwg.org/multipage/scripting.html#restrictions-for-contents-of-script-elements
+QUnit.test('The script element content restrictions', function(assert) {
+  let tokens = tokenize("<script>&quot;hey <b>there</b><!-- comment --></script>");
+  assert.deepEqual(tokens, [startTag('script'), chars('&quot;hey <b>there</b><!-- comment -->'), endTag('script')]);
+});
+
+QUnit.test('Two following script tags', function(assert) {
+  let tokens = tokenize("<script><!-- comment --></script> <script>second</script>");
+
+  assert.deepEqual(tokens, [
+    startTag('script'),
+    chars('<!-- comment -->'),
+    endTag('script'),
+    chars(' '),
+    startTag('script'),
+    chars('second'),
+    endTag('script')
+  ]);
 });
 
 // https://github.com/emberjs/rfcs/blob/master/text/0311-angle-bracket-invocation.md#dynamic-invocations

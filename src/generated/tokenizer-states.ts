@@ -12,6 +12,7 @@ export const enum TokenizerState {
   tagOpen = 'tagOpen',
   endTagOpen = 'endTagOpen',
   tagName = 'tagName',
+  endTagName = 'endTagName',
   rcdataLessThanSign = 'rcdataLessThanSign',
   rcdataEndTagOpen = 'rcdataEndTagOpen',
   rcdataEndTagName = 'rcdataEndTagName',
