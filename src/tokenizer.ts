@@ -99,6 +99,41 @@ export default class Tokenizer implements TokenizerDelegate {
 
   // Data
 
+  beginDoctype() {
+    this.push({
+      type: TokenType.Doctype,
+      name: '',
+    });
+  }
+
+  appendToDoctypeName(char: string) {
+    this.current(TokenType.Doctype).name += char;
+  }
+
+  appendToDoctypePublicIdentifier(char: string) {
+    let doctype = this.current(TokenType.Doctype);
+
+    if (doctype.publicIdentifier === undefined) {
+      doctype.publicIdentifier = char;
+    } else {
+      doctype.publicIdentifier += char;
+    }
+  }
+
+  appendToDoctypeSystemIdentifier(char: string) {
+    let doctype = this.current(TokenType.Doctype);
+
+    if (doctype.systemIdentifier === undefined) {
+      doctype.systemIdentifier = char;
+    } else {
+      doctype.systemIdentifier += char;
+    }
+  }
+
+  endDoctype() {
+    this.addLocInfo();
+  }
+
   beginData() {
     this.push({
       type: TokenType.Chars,

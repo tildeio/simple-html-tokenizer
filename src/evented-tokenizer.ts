@@ -185,6 +185,194 @@ export default class EventedTokenizer {
         this.consume();
         this.transitionTo(TokenizerState.commentStart);
         this.delegate.beginComment();
+      } else {
+        let maybeDoctype = char.toUpperCase() + this.input.substring(this.index, this.index + 6).toUpperCase();
+
+        if (maybeDoctype === 'DOCTYPE') {
+          this.consume();
+          this.consume();
+          this.consume();
+          this.consume();
+          this.consume();
+          this.consume();
+          this.transitionTo(TokenizerState.doctype);
+          this.delegate.beginDoctype();
+        }
+      }
+    },
+
+    doctype() {
+      let char = this.consume();
+
+      if (isSpace(char)) {
+        this.transitionTo(TokenizerState.beforeDoctypeName);
+      }
+    },
+
+    beforeDoctypeName() {
+      let char = this.consume();
+
+      if (isSpace(char)) {
+        return;
+      } else {
+        this.transitionTo(TokenizerState.doctypeName);
+        this.delegate.appendToDoctypeName(char.toLowerCase());
+      }
+    },
+
+    doctypeName() {
+      let char = this.consume();
+
+      if (isSpace(char)) {
+        this.transitionTo(TokenizerState.afterDoctypeName);
+      } else if (char === '>') {
+        this.delegate.endDoctype();
+        this.transitionTo(TokenizerState.beforeData);
+      } else {
+        this.delegate.appendToDoctypeName(char.toLowerCase());
+      }
+    },
+
+    afterDoctypeName() {
+      let char = this.consume();
+
+      if (isSpace(char)) {
+        return;
+      } else if (char === '>') {
+        this.delegate.endDoctype();
+        this.transitionTo(TokenizerState.beforeData);
+      } else {
+        let nextSixChars = char.toUpperCase() + this.input.substring(this.index, this.index + 5).toUpperCase();
+
+        let isPublic = nextSixChars.toUpperCase() === 'PUBLIC';
+        let isSystem = nextSixChars.toUpperCase() === 'SYSTEM';
+
+        if (isPublic || isSystem) {
+          this.consume();
+          this.consume();
+          this.consume();
+          this.consume();
+          this.consume();
+          this.consume();
+        }
+
+        if (isPublic) {
+          this.transitionTo(TokenizerState.afterDoctypePublicKeyword);
+        } else if (isSystem) {
+          this.transitionTo(TokenizerState.afterDoctypeSystemKeyword);
+        }
+      }
+    },
+
+    afterDoctypePublicKeyword() {
+      let char = this.peek();
+
+      if (isSpace(char)) {
+        this.transitionTo(TokenizerState.beforeDoctypePublicIdentifier);
+        this.consume();
+      } else if (char === '"') {
+        this.transitionTo(TokenizerState.doctypePublicIdentifierDoubleQuoted);
+        this.consume();
+      } else if (char === "'") {
+        this.transitionTo(TokenizerState.doctypePublicIdentifierSingleQuoted);
+        this.consume();
+      } else if (char === '>') {
+        this.consume();
+        this.delegate.endDoctype();
+        this.transitionTo(TokenizerState.beforeData);
+      }
+    },
+
+    doctypePublicIdentifierDoubleQuoted() {
+      let char = this.consume();
+
+      if (char === '"') {
+        this.transitionTo(TokenizerState.afterDoctypePublicIdentifier);
+      } else if (char === '>') {
+        this.delegate.endDoctype();
+        this.transitionTo(TokenizerState.beforeData);
+      } else {
+        this.delegate.appendToDoctypePublicIdentifier(char);
+      }
+    },
+
+    doctypePublicIdentifierSingleQuoted() {
+      let char = this.consume();
+
+      if (char === "'") {
+        this.transitionTo(TokenizerState.afterDoctypePublicIdentifier);
+      } else if (char === '>') {
+        this.delegate.endDoctype();
+        this.transitionTo(TokenizerState.beforeData);
+      } else {
+        this.delegate.appendToDoctypePublicIdentifier(char);
+      }
+    },
+
+    afterDoctypePublicIdentifier() {
+      let char = this.consume();
+
+      if (isSpace(char)) {
+        this.transitionTo(TokenizerState.betweenDoctypePublicAndSystemIdentifiers);
+      } else if (char === '>') {
+        this.delegate.endDoctype();
+        this.transitionTo(TokenizerState.beforeData);
+      } else if (char === '"') {
+        this.transitionTo(TokenizerState.doctypeSystemIdentifierDoubleQuoted);
+      } else if (char === "'") {
+        this.transitionTo(TokenizerState.doctypeSystemIdentifierSingleQuoted);
+      }
+    },
+
+    betweenDoctypePublicAndSystemIdentifiers() {
+      let char = this.consume();
+
+      if (isSpace(char)) {
+        return;
+      } else if (char === '>') {
+        this.delegate.endDoctype();
+        this.transitionTo(TokenizerState.beforeData);
+      } else if (char === '"') {
+        this.transitionTo(TokenizerState.doctypeSystemIdentifierDoubleQuoted);
+      } else if (char === "'") {
+        this.transitionTo(TokenizerState.doctypeSystemIdentifierSingleQuoted);
+      }
+    },
+
+    doctypeSystemIdentifierDoubleQuoted() {
+      let char = this.consume();
+
+      if (char === '"') {
+        this.transitionTo(TokenizerState.afterDoctypeSystemIdentifier);
+      } else if (char === '>') {
+        this.delegate.endDoctype();
+        this.transitionTo(TokenizerState.beforeData);
+      } else {
+        this.delegate.appendToDoctypeSystemIdentifier(char);
+      }
+    },
+
+    doctypeSystemIdentifierSingleQuoted() {
+      let char = this.consume();
+
+      if (char === "'") {
+        this.transitionTo(TokenizerState.afterDoctypeSystemIdentifier);
+      } else if (char === '>') {
+        this.delegate.endDoctype();
+        this.transitionTo(TokenizerState.beforeData);
+      } else {
+        this.delegate.appendToDoctypeSystemIdentifier(char);
+      }
+    },
+
+    afterDoctypeSystemIdentifier() {
+      let char = this.consume();
+
+      if (isSpace(char)) {
+        return;
+      } else if (char === '>') {
+        this.delegate.endDoctype();
+        this.transitionTo(TokenizerState.beforeData);
       }
     },
 
