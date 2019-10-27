@@ -1,3 +1,4 @@
+import { fromCodePoint } from 'utf16-char-codes';
 import { NamedEntityMap } from './types';
 
 const HEXCHARCODE = /^#[xX]([A-Fa-f0-9]+)$/;
@@ -13,11 +14,11 @@ export default class EntityParser {
     }
     let matches = entity.match(HEXCHARCODE);
     if (matches) {
-      return String.fromCharCode(parseInt(matches[1], 16));
+      return fromCodePoint(parseInt(matches[1], 16));
     }
     matches = entity.match(CHARCODE);
     if (matches) {
-      return String.fromCharCode(parseInt(matches[1], 10));
+      return fromCodePoint(parseInt(matches[1], 10));
     }
     matches = entity.match(NAMED);
     if (matches) {
