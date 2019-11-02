@@ -31,12 +31,10 @@ QUnit.test('A simple closing tag', function(assert) {
   assert.deepEqual(tokens, [endTag('div')]);
 });
 
-QUnit.test('A closing tag cannot containg trailing spaces', function(assert) {
+QUnit.test('A closing tag can containg trailing spaces', function(assert) {
   let tokens = tokenize('</div   \t\n>');
-  let output = [withSyntaxError(
-    'closing tag must only contain tagname',
-    endTag('div')
-  )];
+  let output = [endTag('div')];
+
   assert.deepEqual(tokens, output);
 });
 

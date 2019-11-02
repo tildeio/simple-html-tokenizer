@@ -266,7 +266,7 @@ export default class EventedTokenizer {
     endTagName() {
       let char = this.consume();
 
-      if (isSpace(char)) {
+      if (isSpace(char) && isAlpha(this.peek())) {
         this.delegate.reportSyntaxError('closing tag must only contain tagname');
       } else if (char === '/') {
         this.delegate.reportSyntaxError('closing tag cannot be self-closing');
@@ -275,7 +275,7 @@ export default class EventedTokenizer {
         this.transitionTo(TokenizerState.beforeData);
         this.tagNameBuffer = '';
       } else {
-        if (!this.delegate.current().syntaxError) {
+        if (!this.delegate.current().syntaxError && !isSpace(char)) {
           this.appendToTagName(char);
         }
       }
