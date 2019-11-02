@@ -267,17 +267,17 @@ export default class EventedTokenizer {
       let char = this.consume();
 
       if (isSpace(char)) {
-        this.transitionTo(TokenizerState.beforeAttributeName);
-        this.tagNameBuffer = '';
+        this.delegate.reportSyntaxError('closing tag must only contain tagname');
       } else if (char === '/') {
-        this.transitionTo(TokenizerState.selfClosingStartTag);
-        this.tagNameBuffer = '';
+        this.delegate.reportSyntaxError('closing tag cannot be self-closing');
       } else if (char === '>') {
         this.delegate.finishTag();
         this.transitionTo(TokenizerState.beforeData);
         this.tagNameBuffer = '';
       } else {
-        this.appendToTagName(char);
+        if (!this.delegate.current().syntaxError) {
+          this.appendToTagName(char);
+        }
       }
     },
 
@@ -487,6 +487,10 @@ export default class EventedTokenizer {
         this.tagNameBuffer = '';
         this.delegate.beginEndTag();
         this.appendToTagName(char);
+      } else {
+        this.transitionTo(TokenizerState.endTagName);
+        this.delegate.beginEndTag();
+        this.delegate.reportSyntaxError('closing tag cannot contain whitespace before tagname');
       }
     }
   };
