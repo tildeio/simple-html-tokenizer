@@ -266,7 +266,7 @@ export default class EventedTokenizer {
     endTagName() {
       let char = this.consume();
 
-      if (isSpace(char) && isAlpha(this.peek())) {
+      if (isSpace(char)) {
         this.delegate.reportSyntaxError('closing tag must only contain tagname');
       } else if (char === '/') {
         this.delegate.reportSyntaxError('closing tag cannot be self-closing');
@@ -480,9 +480,10 @@ export default class EventedTokenizer {
     },
 
     endTagOpen() {
-      let char = this.consume();
+      let char = this.peek();
 
       if (char === '@' || char === ':' || isAlpha(char)) {
+        this.consume();
         this.transitionTo(TokenizerState.endTagName);
         this.tagNameBuffer = '';
         this.delegate.beginEndTag();
@@ -490,7 +491,6 @@ export default class EventedTokenizer {
       } else {
         this.transitionTo(TokenizerState.endTagName);
         this.delegate.beginEndTag();
-        this.delegate.reportSyntaxError('closing tag cannot contain whitespace before tagname');
       }
     }
   };
