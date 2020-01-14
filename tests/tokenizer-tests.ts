@@ -31,9 +31,12 @@ QUnit.test('A simple closing tag', function(assert) {
   assert.deepEqual(tokens, [endTag('div')]);
 });
 
-QUnit.test('A closing tag can containg trailing spaces', function(assert) {
+QUnit.test('A closing tag cannot containg trailing spaces', function(assert) {
   let tokens = tokenize('</div   \t\n>');
-  let output = [endTag('div')];
+  let output = [withSyntaxError(
+    'closing tag must only contain tagname',
+    endTag('div')
+  )];
 
   assert.deepEqual(tokens, output);
 });
@@ -41,7 +44,7 @@ QUnit.test('A closing tag can containg trailing spaces', function(assert) {
 QUnit.test('A closing tag cannot containg leading spaces', function(assert) {
   let tokens = tokenize('</ div>');
   let output = [withSyntaxError(
-    'closing tag cannot contain whitespace before tagname',
+    'closing tag must only contain tagname',
     endTag('')
   )];
 
@@ -50,24 +53,26 @@ QUnit.test('A closing tag cannot containg leading spaces', function(assert) {
 
 QUnit.test('A closing tag cannot contain an attribute', function(assert) {
   let tokens = tokenize('</div foo="bar">');
-
-  assert.deepEqual(tokens, [withSyntaxError(
+  let output = [withSyntaxError(
     'closing tag must only contain tagname',
     endTag('div')
-  )]);
+  )];
+
+  assert.deepEqual(tokens, output);
 });
 
 QUnit.test('A closing tag cannot contain multiple attributes', function(assert) {
   let tokens = tokenize('</div foo="bar" foo="baz">');
-  assert.deepEqual(tokens, [withSyntaxError(
+  let output = [withSyntaxError(
     'closing tag must only contain tagname',
     endTag('div')
-  )]);
+  )];
+
+  assert.deepEqual(tokens, output);
 });
 
 QUnit.test('A closing tag cannot be self-closing', function(assert) {
   let tokens = tokenize('</div/>');
-
   let output = [withSyntaxError(
     'closing tag cannot be self-closing',
     endTag('div')
