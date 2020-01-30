@@ -228,6 +228,12 @@ QUnit.test('The title element content is always text', function(assert) {
   assert.deepEqual(tokens, [startTag('title'), chars('"hey <b>there</b><!-- comment -->'), endTag('title')]);
 });
 
+// https://github.com/emberjs/ember.js/issues/18530
+QUnit.test('Title element content is not text', function(assert) {
+  let tokens = tokenize("<Title><!-- hello --></Title>");
+  assert.deepEqual(tokens, [startTag('Title'), comment(' hello '), endTag('Title')]);
+});
+
 // https://html.spec.whatwg.org/multipage/semantics.html#the-style-element
 QUnit.test('The style element content is always text', function(assert) {
   let tokens = tokenize("<style>&quot;hey <b>there</b><!-- comment --></style>");

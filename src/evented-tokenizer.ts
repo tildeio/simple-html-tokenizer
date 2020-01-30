@@ -115,7 +115,7 @@ export default class EventedTokenizer {
   }
 
   private isIgnoredEndTag(): boolean {
-    let tag = this.tagNameBuffer.toLowerCase();
+    let tag = this.tagNameBuffer;
 
     return (tag === 'title' && this.input.substring(this.index, this.index + 8) !== '</title>') ||
       (tag === 'style' && this.input.substring(this.index, this.index + 8) !== '</style>') ||
@@ -146,7 +146,7 @@ export default class EventedTokenizer {
 
     data() {
       let char = this.peek();
-      let tag = this.tagNameBuffer.toLowerCase();
+      let tag = this.tagNameBuffer;
 
       if (char === '<' && !this.isIgnoredEndTag()) {
         this.delegate.finishData();
