@@ -132,7 +132,7 @@ export default class EventedTokenizer {
         this.consume();
       } else {
         if (char === '\n') {
-          let tag = this.tagNameBuffer.toLowerCase();
+          let tag = this.tagNameBuffer;
 
           if (tag === 'pre' || tag === 'textarea') {
             this.consume();
