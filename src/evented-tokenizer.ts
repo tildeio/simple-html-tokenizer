@@ -11,6 +11,7 @@ export default class EventedTokenizer {
   private index = -1;
 
   private tagNameBuffer = '';
+  private selfClosingBuffer = false;
 
   constructor(
     private delegate: TokenizerDelegate,
@@ -134,7 +135,7 @@ export default class EventedTokenizer {
         if (char === '\n') {
           let tag = this.tagNameBuffer.toLowerCase();
 
-          if (tag === 'pre' || tag === 'textarea') {
+          if ((tag === 'pre' || tag === 'textarea') && !this.selfClosingBuffer) {
             this.consume();
           }
         }
@@ -468,8 +469,10 @@ export default class EventedTokenizer {
 
     selfClosingStartTag() {
       let char = this.peek();
+      this.selfClosingBuffer = false;
 
       if (char === '>') {
+        this.selfClosingBuffer = true;
         this.consume();
         this.delegate.markTagAsSelfClosing();
         this.delegate.finishTag();
