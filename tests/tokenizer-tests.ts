@@ -216,10 +216,20 @@ QUnit.test('A newline immediately following a <PRE> tag is stripped', function(a
   assert.deepEqual(tokens, [startTag('PRE'), chars('hello'), endTag('PRE')]);
 });
 
+QUnit.test('A newline immediately following a <pre/> tag is not stripped', function(assert) {
+  let tokens = tokenize("<pre/>\n");
+  assert.deepEqual(tokens, [startTag('pre', [], true), chars('\n')]);
+});
+
 // https://html.spec.whatwg.org/multipage/syntax.html#element-restrictions
 QUnit.test('A newline immediately following a <textarea> tag is stripped', function(assert) {
   let tokens = tokenize("<textarea>\nhello</textarea>");
   assert.deepEqual(tokens, [startTag('textarea'), chars('hello'), endTag('textarea')]);
+});
+
+QUnit.test('A newline immediately following a <textarea/> tag is not stripped', function(assert) {
+  let tokens = tokenize("<textarea/>\n");
+  assert.deepEqual(tokens, [startTag('textarea', [], true), chars('\n')]);
 });
 
 // https://html.spec.whatwg.org/multipage/semantics.html#the-title-element
