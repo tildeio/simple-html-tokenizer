@@ -8,6 +8,7 @@ export interface EntityParser {
 
 export interface TokenizerOptions {
   loc?: boolean;
+  mode?: 'precompile' | 'codemod';
 }
 
 export type Attribute = [string, string, boolean];

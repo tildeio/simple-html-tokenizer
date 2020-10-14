@@ -222,6 +222,29 @@ QUnit.test('A newline immediately following a <textarea> tag is stripped', funct
   assert.deepEqual(tokens, [startTag('textarea'), chars('hello'), endTag('textarea')]);
 });
 
+// https://html.spec.whatwg.org/multipage/syntax.html#element-restrictions
+QUnit.test('codemod: A newline immediately following a <pre> tag is stripped', function(assert) {
+  let tokens = tokenize("<pre>\nhello</pre>", { mode: 'codemod' });
+  assert.deepEqual(tokens, [startTag('pre'), chars('\nhello'), endTag('pre')]);
+});
+
+QUnit.test('codemod: A newline immediately following a closing </pre> tag is not stripped', function(assert) {
+  let tokens = tokenize("\n<pre>\nhello</pre>\n", { mode: 'codemod' });
+  assert.deepEqual(tokens, [chars('\n'), startTag('pre'), chars('\nhello'), endTag('pre'), chars('\n')]);
+});
+
+// https://html.spec.whatwg.org/multipage/syntax.html#element-restrictions
+QUnit.test('codemod: A newline immediately following a <PRE> tag is stripped', function(assert) {
+  let tokens = tokenize("<PRE>\nhello</PRE>", { mode: 'codemod' });
+  assert.deepEqual(tokens, [startTag('PRE'), chars('\nhello'), endTag('PRE')]);
+});
+
+// https://html.spec.whatwg.org/multipage/syntax.html#element-restrictions
+QUnit.test('codemod: A newline immediately following a <textarea> tag is stripped', function(assert) {
+  let tokens = tokenize("<textarea>\nhello</textarea>", { mode: 'codemod' });
+  assert.deepEqual(tokens, [startTag('textarea'), chars('\nhello'), endTag('textarea')]);
+});
+
 // https://html.spec.whatwg.org/multipage/semantics.html#the-title-element
 QUnit.test('The title element content is always text', function(assert) {
   let tokens = tokenize("<title>&quot;hey <b>there</b><!-- comment --></title>");
