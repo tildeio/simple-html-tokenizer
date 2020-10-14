@@ -14,7 +14,8 @@ export default class EventedTokenizer {
 
   constructor(
     private delegate: TokenizerDelegate,
-    private entityParser: EntityParser
+    private entityParser: EntityParser,
+    private mode: 'codemod' | 'precompile' = 'precompile'
   ) {
     this.reset();
   }
@@ -131,7 +132,7 @@ export default class EventedTokenizer {
         this.markTagStart();
         this.consume();
       } else {
-        if (char === '\n') {
+        if (this.mode === 'precompile' && char === '\n') {
           let tag = this.tagNameBuffer.toLowerCase();
 
           if (tag === 'pre' || tag === 'textarea') {

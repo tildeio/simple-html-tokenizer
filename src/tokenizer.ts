@@ -21,7 +21,7 @@ export default class Tokenizer implements TokenizerDelegate {
     entityParser: EntityParser,
     private options: TokenizerOptions = {}
   ) {
-    this.tokenizer = new EventedTokenizer(this, entityParser);
+    this.tokenizer = new EventedTokenizer(this, entityParser, options.mode);
     this._currentAttribute = undefined;
   }
 
