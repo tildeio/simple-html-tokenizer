@@ -1,4 +1,4 @@
-# Simple HTML Tokenizer [![Build Status](https://travis-ci.org/tildeio/simple-html-tokenizer.svg?branch=master)](https://travis-ci.org/tildeio/simple-html-tokenizer)
+# Simple HTML Tokenizer [![Build Status](![CI](https://github.com/tildeio/simple-html-tokenizer/workflows/CI/badge.svg))](https://github.com/tildeio/simple-html-tokenizer/actions?query=workflow%3ACI)
 
 Simple HTML Tokenizer is a lightweight JavaScript library that can be
 used to tokenize the kind of HTML normally found in templates. It can be
