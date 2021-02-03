@@ -1,5 +1,9 @@
 import {
   tokenize,
+  EventedTokenizer,
+  TokenizerDelegate,
+  EntityParser,
+  Doctype,
   StartTag,
   EndTag,
   Comment,
@@ -10,6 +14,150 @@ import {
 } from 'simple-html-tokenizer';
 
 QUnit.module('simple-html-tokenizer - tokenizer');
+
+QUnit.test('does not fail if delegate does not include doctype methods', function(assert) {
+  let steps: Array<string[]> = [];
+
+  class MissingDoctypeTokenizerDelegate implements TokenizerDelegate {
+    reset() {
+      steps.push(['reset']);
+    }
+    finishData() {
+      steps.push(['finishData']);
+    }
+    tagOpen() {
+      steps.push(['tagOpen']);
+    }
+
+    beginData() {
+      steps.push(['beginData']);
+    }
+
+    appendToData(char: string) {
+      steps.push(['appendToData', char]);
+    }
+
+    beginStartTag() {
+      steps.push(['beginStartTag']);
+    }
+    appendToTagName(char: string) {
+      steps.push(['appendToTagName', char]);
+    }
+
+    beginAttribute() {
+      steps.push(['beginAttribute']);
+    }
+    appendToAttributeName(char: string) {
+      steps.push(['appendToAttributeName', char]);
+    }
+    beginAttributeValue(quoted: boolean) {
+      steps.push(['beginAttributeValue', `${quoted}`]);
+    }
+
+    appendToAttributeValue(char: string) {
+      steps.push(['appendToAttributeValue', char]);
+    }
+    finishAttributeValue() {
+      steps.push(['finishAttributeValue']);
+    }
+
+    markTagAsSelfClosing() {
+      steps.push(['markTagAsSelfClosing']);
+    }
+
+    beginEndTag() {
+      steps.push(['beginEndTag']);
+    }
+    finishTag() {
+      steps.push(['finishTag']);
+    }
+
+    beginComment() {
+      steps.push(['beginComment']);
+    }
+    appendToCommentData(char: string) {
+      steps.push(['appendToCommentData', char]);
+    }
+    finishComment() {
+      steps.push(['finishComment']);
+    }
+
+    reportSyntaxError(error: string) {
+      steps.push(['reportSyntaxError', error]);
+    }
+  }
+
+  let delegate = new MissingDoctypeTokenizerDelegate();
+  let tokenizer = new EventedTokenizer(delegate, new EntityParser({}));
+
+  tokenizer.tokenize('\n<!-- comment here --><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n<!-- comment here -->');
+
+  assert.deepEqual(steps, [
+    [ "reset" ],
+    [ "reset" ],
+    [ "beginData" ],
+    [ "appendToData", "\n" ],
+    [ "finishData" ],
+    [ "tagOpen" ],
+    [ "beginComment" ],
+    [ "appendToCommentData", " " ],
+    [ "appendToCommentData", "c" ],
+    [ "appendToCommentData", "o" ],
+    [ "appendToCommentData", "m" ],
+    [ "appendToCommentData", "m" ],
+    [ "appendToCommentData", "e" ],
+    [ "appendToCommentData", "n" ],
+    [ "appendToCommentData", "t" ],
+    [ "appendToCommentData", " " ],
+    [ "appendToCommentData", "h" ],
+    [ "appendToCommentData", "e" ],
+    [ "appendToCommentData", "r" ],
+    [ "appendToCommentData", "e" ],
+    [ "appendToCommentData", " " ],
+    [ "finishComment" ],
+    [ "tagOpen" ],
+    [ "beginData" ],
+    [ "appendToData", "\n" ],
+    [ "finishData" ],
+    [ "tagOpen" ],
+    [ "beginComment" ],
+    [ "appendToCommentData", " " ],
+    [ "appendToCommentData", "c" ],
+    [ "appendToCommentData", "o" ],
+    [ "appendToCommentData", "m" ],
+    [ "appendToCommentData", "m" ],
+    [ "appendToCommentData", "e" ],
+    [ "appendToCommentData", "n" ],
+    [ "appendToCommentData", "t" ],
+    [ "appendToCommentData", " " ],
+    [ "appendToCommentData", "h" ],
+    [ "appendToCommentData", "e" ],
+    [ "appendToCommentData", "r" ],
+    [ "appendToCommentData", "e" ],
+    [ "appendToCommentData", " " ],
+    [ "finishComment" ]
+  ]);
+});
+
+QUnit.test('Doctype', function(assert) {
+  let tokens = tokenize('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">');
+  assert.deepEqual(tokens, [ doctype('-//W3C//DTD HTML 4.01//EN', 'http://www.w3.org/TR/html4/strict.dtd') ], 'Standard HTML 4.01 Strict doctype');
+
+  tokens = tokenize('<!DOCTYPE html><html><body></body></html>');
+  assert.deepEqual(tokens, [
+    doctype(),
+    startTag('html'),
+    startTag('body'),
+    endTag('body'),
+    endTag('html'),
+  ], 'DOCTYPE is included in tokens');
+
+  tokens = tokenize('<!-- comment --><!DOCTYPE html>');
+  assert.deepEqual(tokens, [comment(' comment '), doctype()], 'DOCTYPE after comments is valid');
+
+  tokens = tokenize('<!-- comment --><!DOCTYPE html PUBLIC >');
+  assert.deepEqual(tokens, [comment(' comment '), doctype()], 'DOCTYPE after comments is valid');
+});
 
 QUnit.test('Simple content', function(assert) {
   let tokens = tokenize('hello');
@@ -289,6 +437,25 @@ QUnit.test('An Emberish named arg invocation', function(assert) {
   assert.deepEqual(tokens, [startTag('@foo'), endTag('@foo')]);
 });
 
+QUnit.test('Parsing <script>s out of a complext HTML document [stefanpenner/find-scripts-srcs-in-document#1]', function(assert) {
+  let input = `<!DOCTYPE html><html><head><script src="/foo.js"></script><script src="/bar.js"></script><script src="/baz.js"></script></head></html>`;
+
+  let tokens = tokenize(input);
+  assert.deepEqual(tokens, [
+    doctype(),
+    startTag('html'),
+    startTag('head'),
+    startTag('script', [['src','/foo.js', true]]),
+    endTag('script'),
+    startTag('script', [['src','/bar.js', true]]),
+    endTag('script'),
+    startTag('script', [['src','/baz.js', true]]),
+    endTag('script'),
+    endTag('head'),
+    endTag('html'),
+  ]);
+});
+
 QUnit.module('simple-html-tokenizer - preprocessing');
 
 QUnit.test('Carriage returns are replaced with line feeds', function(assert) {
@@ -390,6 +557,23 @@ function endTag(tagName: string): EndTag {
     type: TokenType.EndTag,
     tagName: tagName
   };
+}
+
+function doctype(publicIdentifier?: string, systemIdentifier?: string): Doctype {
+  let doctype: Doctype = {
+    type: TokenType.Doctype,
+    name: 'html',
+  };
+
+  if (publicIdentifier) {
+    doctype.publicIdentifier = publicIdentifier;
+  }
+
+  if (systemIdentifier) {
+    doctype.systemIdentifier = systemIdentifier;
+  }
+
+  return doctype;
 }
 
 function locInfo(

@@ -30,6 +30,12 @@ export interface TokenBase<T extends TokenType> {
   loc?: Location;
 }
 
+export interface Doctype extends TokenBase<TokenType.Doctype> {
+  name: string;
+  publicIdentifier?: string;
+  systemIdentifier?: string;
+}
+
 export interface StartTag extends TokenBase<TokenType.StartTag> {
   tagName: string;
   attributes: Attribute[];
@@ -48,9 +54,10 @@ export interface Comment extends TokenBase<TokenType.Comment> {
   chars: string;
 }
 
-export type Token = StartTag | EndTag | Chars | Comment;
+export type Token = StartTag | EndTag | Chars | Comment | Doctype;
 
 export const enum TokenType {
+  Doctype = 'Doctype',
   StartTag = 'StartTag',
   EndTag = 'EndTag',
   Chars = 'Chars',
@@ -62,12 +69,20 @@ export interface TokenMap {
   EndTag: EndTag;
   Chars: Chars;
   Comment: Comment;
+  Doctype: Doctype;
 }
 
 export interface TokenizerDelegate {
   reset(): void;
   finishData(): void;
   tagOpen(): void;
+
+  // TODO: make these non-optional in preparation for the next major version release
+  beginDoctype?(): void;
+  appendToDoctypeName?(char: string): void;
+  appendToDoctypePublicIdentifier?(char: string): void;
+  appendToDoctypeSystemIdentifier?(char: string): void;
+  endDoctype?(): void;
 
   beginData(): void;
   appendToData(char: string): void;
