@@ -1,3 +1,12 @@
+## v0.5.11 (2021-02-03)
+
+#### :rocket: Enhancement
+* [#71](https://github.com/tildeio/simple-html-tokenizer/pull/71) Add support for parsing `<!DOCTYPE html>` ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v0.5.10 (2020-10-14)
 
 #### :bug: Bug Fix
