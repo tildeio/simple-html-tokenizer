@@ -77,11 +77,12 @@ export interface TokenizerDelegate {
   finishData(): void;
   tagOpen(): void;
 
-  beginDoctype(): void;
-  appendToDoctypeName(char: string): void;
-  appendToDoctypePublicIdentifier(char: string): void;
-  appendToDoctypeSystemIdentifier(char: string): void;
-  endDoctype(): void;
+  // TODO: make these non-optional in preparation for the next major version release
+  beginDoctype?(): void;
+  appendToDoctypeName?(char: string): void;
+  appendToDoctypePublicIdentifier?(char: string): void;
+  appendToDoctypeSystemIdentifier?(char: string): void;
+  endDoctype?(): void;
 
   beginData(): void;
   appendToData(char: string): void;

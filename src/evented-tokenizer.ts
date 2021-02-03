@@ -196,7 +196,7 @@ export default class EventedTokenizer {
           this.consume();
           this.consume();
           this.transitionTo(TokenizerState.doctype);
-          this.delegate.beginDoctype();
+          if (this.delegate.beginDoctype) this.delegate.beginDoctype();
         }
       }
     },
@@ -216,7 +216,7 @@ export default class EventedTokenizer {
         return;
       } else {
         this.transitionTo(TokenizerState.doctypeName);
-        this.delegate.appendToDoctypeName(char.toLowerCase());
+        if (this.delegate.appendToDoctypeName) this.delegate.appendToDoctypeName(char.toLowerCase());
       }
     },
 
@@ -226,10 +226,10 @@ export default class EventedTokenizer {
       if (isSpace(char)) {
         this.transitionTo(TokenizerState.afterDoctypeName);
       } else if (char === '>') {
-        this.delegate.endDoctype();
+        if (this.delegate.endDoctype) this.delegate.endDoctype();
         this.transitionTo(TokenizerState.beforeData);
       } else {
-        this.delegate.appendToDoctypeName(char.toLowerCase());
+        if (this.delegate.appendToDoctypeName) this.delegate.appendToDoctypeName(char.toLowerCase());
       }
     },
 
@@ -239,7 +239,7 @@ export default class EventedTokenizer {
       if (isSpace(char)) {
         return;
       } else if (char === '>') {
-        this.delegate.endDoctype();
+        if (this.delegate.endDoctype) this.delegate.endDoctype();
         this.transitionTo(TokenizerState.beforeData);
       } else {
         let nextSixChars = char.toUpperCase() + this.input.substring(this.index, this.index + 5).toUpperCase();
@@ -278,7 +278,7 @@ export default class EventedTokenizer {
         this.consume();
       } else if (char === '>') {
         this.consume();
-        this.delegate.endDoctype();
+        if (this.delegate.endDoctype) this.delegate.endDoctype();
         this.transitionTo(TokenizerState.beforeData);
       }
     },
@@ -289,10 +289,10 @@ export default class EventedTokenizer {
       if (char === '"') {
         this.transitionTo(TokenizerState.afterDoctypePublicIdentifier);
       } else if (char === '>') {
-        this.delegate.endDoctype();
+        if (this.delegate.endDoctype) this.delegate.endDoctype();
         this.transitionTo(TokenizerState.beforeData);
       } else {
-        this.delegate.appendToDoctypePublicIdentifier(char);
+        if (this.delegate.appendToDoctypePublicIdentifier) this.delegate.appendToDoctypePublicIdentifier(char);
       }
     },
 
@@ -302,10 +302,10 @@ export default class EventedTokenizer {
       if (char === "'") {
         this.transitionTo(TokenizerState.afterDoctypePublicIdentifier);
       } else if (char === '>') {
-        this.delegate.endDoctype();
+        if (this.delegate.endDoctype) this.delegate.endDoctype();
         this.transitionTo(TokenizerState.beforeData);
       } else {
-        this.delegate.appendToDoctypePublicIdentifier(char);
+        if (this.delegate.appendToDoctypePublicIdentifier) this.delegate.appendToDoctypePublicIdentifier(char);
       }
     },
 
@@ -315,7 +315,7 @@ export default class EventedTokenizer {
       if (isSpace(char)) {
         this.transitionTo(TokenizerState.betweenDoctypePublicAndSystemIdentifiers);
       } else if (char === '>') {
-        this.delegate.endDoctype();
+        if (this.delegate.endDoctype) this.delegate.endDoctype();
         this.transitionTo(TokenizerState.beforeData);
       } else if (char === '"') {
         this.transitionTo(TokenizerState.doctypeSystemIdentifierDoubleQuoted);
@@ -330,7 +330,7 @@ export default class EventedTokenizer {
       if (isSpace(char)) {
         return;
       } else if (char === '>') {
-        this.delegate.endDoctype();
+        if (this.delegate.endDoctype) this.delegate.endDoctype();
         this.transitionTo(TokenizerState.beforeData);
       } else if (char === '"') {
         this.transitionTo(TokenizerState.doctypeSystemIdentifierDoubleQuoted);
@@ -345,10 +345,10 @@ export default class EventedTokenizer {
       if (char === '"') {
         this.transitionTo(TokenizerState.afterDoctypeSystemIdentifier);
       } else if (char === '>') {
-        this.delegate.endDoctype();
+        if (this.delegate.endDoctype) this.delegate.endDoctype();
         this.transitionTo(TokenizerState.beforeData);
       } else {
-        this.delegate.appendToDoctypeSystemIdentifier(char);
+        if (this.delegate.appendToDoctypeSystemIdentifier) this.delegate.appendToDoctypeSystemIdentifier(char);
       }
     },
 
@@ -358,10 +358,10 @@ export default class EventedTokenizer {
       if (char === "'") {
         this.transitionTo(TokenizerState.afterDoctypeSystemIdentifier);
       } else if (char === '>') {
-        this.delegate.endDoctype();
+        if (this.delegate.endDoctype) this.delegate.endDoctype();
         this.transitionTo(TokenizerState.beforeData);
       } else {
-        this.delegate.appendToDoctypeSystemIdentifier(char);
+        if (this.delegate.appendToDoctypeSystemIdentifier) this.delegate.appendToDoctypeSystemIdentifier(char);
       }
     },
 
@@ -371,7 +371,7 @@ export default class EventedTokenizer {
       if (isSpace(char)) {
         return;
       } else if (char === '>') {
-        this.delegate.endDoctype();
+        if (this.delegate.endDoctype) this.delegate.endDoctype();
         this.transitionTo(TokenizerState.beforeData);
       }
     },

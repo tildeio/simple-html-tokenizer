@@ -1,5 +1,8 @@
 import {
   tokenize,
+  EventedTokenizer,
+  TokenizerDelegate,
+  EntityParser,
   Doctype,
   StartTag,
   EndTag,
@@ -11,6 +14,130 @@ import {
 } from 'simple-html-tokenizer';
 
 QUnit.module('simple-html-tokenizer - tokenizer');
+
+QUnit.test('does not fail if delegate does not include doctype methods', function(assert) {
+  let steps: Array<string[]> = [];
+
+  class MissingDoctypeTokenizerDelegate implements TokenizerDelegate {
+    reset() {
+      steps.push(['reset']);
+    }
+    finishData() {
+      steps.push(['finishData']);
+    }
+    tagOpen() {
+      steps.push(['tagOpen']);
+    }
+
+    beginData() {
+      steps.push(['beginData']);
+    }
+
+    appendToData(char: string) {
+      steps.push(['appendToData', char]);
+    }
+
+    beginStartTag() {
+      steps.push(['beginStartTag']);
+    }
+    appendToTagName(char: string) {
+      steps.push(['appendToTagName', char]);
+    }
+
+    beginAttribute() {
+      steps.push(['beginAttribute']);
+    }
+    appendToAttributeName(char: string) {
+      steps.push(['appendToAttributeName', char]);
+    }
+    beginAttributeValue(quoted: boolean) {
+      steps.push(['beginAttributeValue', `${quoted}`]);
+    }
+
+    appendToAttributeValue(char: string) {
+      steps.push(['appendToAttributeValue', char]);
+    }
+    finishAttributeValue() {
+      steps.push(['finishAttributeValue']);
+    }
+
+    markTagAsSelfClosing() {
+      steps.push(['markTagAsSelfClosing']);
+    }
+
+    beginEndTag() {
+      steps.push(['beginEndTag']);
+    }
+    finishTag() {
+      steps.push(['finishTag']);
+    }
+
+    beginComment() {
+      steps.push(['beginComment']);
+    }
+    appendToCommentData(char: string) {
+      steps.push(['appendToCommentData', char]);
+    }
+    finishComment() {
+      steps.push(['finishComment']);
+    }
+
+    reportSyntaxError(error: string) {
+      steps.push(['reportSyntaxError', error]);
+    }
+  }
+
+  let delegate = new MissingDoctypeTokenizerDelegate();
+  let tokenizer = new EventedTokenizer(delegate, new EntityParser({}));
+
+  tokenizer.tokenize('\n<!-- comment here --><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n<!-- comment here -->');
+
+  assert.deepEqual(steps, [
+    [ "reset" ],
+    [ "reset" ],
+    [ "beginData" ],
+    [ "appendToData", "\n" ],
+    [ "finishData" ],
+    [ "tagOpen" ],
+    [ "beginComment" ],
+    [ "appendToCommentData", " " ],
+    [ "appendToCommentData", "c" ],
+    [ "appendToCommentData", "o" ],
+    [ "appendToCommentData", "m" ],
+    [ "appendToCommentData", "m" ],
+    [ "appendToCommentData", "e" ],
+    [ "appendToCommentData", "n" ],
+    [ "appendToCommentData", "t" ],
+    [ "appendToCommentData", " " ],
+    [ "appendToCommentData", "h" ],
+    [ "appendToCommentData", "e" ],
+    [ "appendToCommentData", "r" ],
+    [ "appendToCommentData", "e" ],
+    [ "appendToCommentData", " " ],
+    [ "finishComment" ],
+    [ "tagOpen" ],
+    [ "beginData" ],
+    [ "appendToData", "\n" ],
+    [ "finishData" ],
+    [ "tagOpen" ],
+    [ "beginComment" ],
+    [ "appendToCommentData", " " ],
+    [ "appendToCommentData", "c" ],
+    [ "appendToCommentData", "o" ],
+    [ "appendToCommentData", "m" ],
+    [ "appendToCommentData", "m" ],
+    [ "appendToCommentData", "e" ],
+    [ "appendToCommentData", "n" ],
+    [ "appendToCommentData", "t" ],
+    [ "appendToCommentData", " " ],
+    [ "appendToCommentData", "h" ],
+    [ "appendToCommentData", "e" ],
+    [ "appendToCommentData", "r" ],
+    [ "appendToCommentData", "e" ],
+    [ "appendToCommentData", " " ],
+    [ "finishComment" ]
+  ]);
+});
 
 QUnit.test('Doctype', function(assert) {
   let tokens = tokenize('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">');
