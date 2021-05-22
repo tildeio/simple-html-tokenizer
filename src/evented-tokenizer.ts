@@ -120,7 +120,7 @@ export default class EventedTokenizer {
 
     return (tag === 'title' && this.input.substring(this.index, this.index + 8) !== '</title>') ||
       (tag === 'style' && this.input.substring(this.index, this.index + 8) !== '</style>') ||
-      (tag === 'script' && this.input.substring(this.index, this.index + 9) !== '</script>');
+      (tag === 'script' && this.input.substring(this.index, this.index + 9) !== '<\/script>');
   }
 
   states: { [k in TokenizerState]?: (this: EventedTokenizer) => void } = {
