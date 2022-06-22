@@ -34,7 +34,7 @@
     "broccoli-tslinter": "^3.0.1",
     "broccoli-typescript-compiler": "^2.2.0",
     "ember-cli": "^3.0.0",
-    "got": "^8.2.0",
+    "got": "^11.8.5",
     "in-repo-commands": "file:./commands",
     "nyc": "^11.4.1",
     "qunit": "^2.5.1",
