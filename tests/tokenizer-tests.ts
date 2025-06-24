@@ -169,6 +169,32 @@ QUnit.test('A simple tag', function(assert) {
   assert.deepEqual(tokens, [startTag('div')]);
 });
 
+QUnit.test('A simple tag with leading non alpha chars', function(assert) {
+  let tokens = tokenize('<_div>');
+  assert.deepEqual(tokens, [startTag('_div')]);
+
+  tokens = tokenize('<$div>');
+  assert.deepEqual(tokens, [startTag('$div')]);
+
+  tokens = tokenize('<:div>');
+  assert.deepEqual(tokens, [startTag(':div')]);
+
+  tokens = tokenize('<@div>');
+  assert.deepEqual(tokens, [startTag('@div')]);
+
+  tokens = tokenize('<üdiv>');
+  assert.deepEqual(tokens, [startTag('üdiv')]);
+
+  tokens = tokenize('<€div>');
+  assert.deepEqual(tokens, [startTag('€div')]);
+
+  tokens = tokenize('<div😀>');
+  assert.deepEqual(tokens, [startTag('div😀')]);
+
+  tokens = tokenize('<di😀v>');
+  assert.deepEqual(tokens, [startTag('di😀v')]);
+});
+
 QUnit.test('A simple tag with trailing spaces', function(assert) {
   let tokens = tokenize('<div   \t\n>');
   assert.deepEqual(tokens, [startTag('div')]);
@@ -177,6 +203,32 @@ QUnit.test('A simple tag with trailing spaces', function(assert) {
 QUnit.test('A simple closing tag', function(assert) {
   let tokens = tokenize('</div>');
   assert.deepEqual(tokens, [endTag('div')]);
+});
+
+QUnit.test('A simple closing tag with leading non alpha chars', function(assert) {
+  let tokens = tokenize('</_div>');
+  assert.deepEqual(tokens, [endTag('_div')]);
+
+  tokens = tokenize('</$div>');
+  assert.deepEqual(tokens, [endTag('$div')]);
+
+  tokens = tokenize('</:div>');
+  assert.deepEqual(tokens, [endTag(':div')]);
+
+  tokens = tokenize('</@div>');
+  assert.deepEqual(tokens, [endTag('@div')]);
+
+  tokens = tokenize('</üdiv>');
+  assert.deepEqual(tokens, [endTag('üdiv')]);
+
+  tokens = tokenize('</€div>');
+  assert.deepEqual(tokens, [endTag('€div')]);
+
+  tokens = tokenize('</di😀v>');
+  assert.deepEqual(tokens, [endTag('di😀v')]);
+
+  tokens = tokenize('</div😀>');
+  assert.deepEqual(tokens, [endTag('div😀')]);
 });
 
 QUnit.test('A simple closing tag with trailing spaces', function(assert) {
